@@ -148,6 +148,26 @@ openclaw devices list
 openclaw devices approve <id>
 ```
 
+## Channels (Telegram)
+
+```bash
+# List channels
+openclaw channels list
+
+# Channel status
+openclaw channels status
+
+# Add/update Telegram bot
+openclaw channels add --channel telegram --token "<BOT_TOKEN>" --name "GlitchClaw Agent"
+
+# Enable/disable plugin
+openclaw plugins enable telegram
+openclaw plugins disable telegram
+
+# View channel logs
+openclaw channels logs
+```
+
 ## Troubleshooting
 
 ```bash

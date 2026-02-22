@@ -22,6 +22,8 @@
 ```
 Human Director (You)
   │
+  ├── Telegram Bot (@glitchclaw_agent_bot) ── 質問・通知チャンネル
+  │
   ▼
 OpenClaw Gateway (ws://127.0.0.1:18789)
   │
@@ -40,15 +42,22 @@ OpenClaw Gateway (ws://127.0.0.1:18789)
 | **GitHub MCP** | Issue / PR / レビュー / マージ自動化 | 38 tools |
 | **Suno MCP** | AI 音楽生成（BGM・SE） | Playwright 経由 |
 
+### Communication
+
+エージェントと人間ディレクターの双方向コミュニケーションは **Telegram Bot** 経由で行う。
+エージェントが判断に迷った場合、Telegram で即座に質問が届き、スマホから回答可能。
+
 ### Workflow
 
 ```
 1. Human: BACKLOG.md にタスクを定義（受け入れ条件付き）
-2. Architect: タスクを分解し、Builder に割り当て
-3. Builder: feat/* ブランチで実装 → PR 作成
-4. Reviewer: コードレビュー + パフォーマンスチェック
-5. Human: PR を確認 → マージ承認
-6. (optional) android_smoke.sh で実機スモークテスト
+2. Human: BOOTSTRAP.md の指示を architect に渡して開発開始
+3. Architect: タスクを分解し、Builder に割り当て
+4. Builder: feat/* ブランチで実装 → PR 作成
+5. Reviewer: コードレビュー + パフォーマンスチェック
+6. Agent → Human: 不明点は Telegram で質問（GitHub Issue にも記録）
+7. Human: PR を確認 → マージ承認
+8. (optional) android_smoke.sh で実機スモークテスト
 ```
 
 ## Tech Stack
@@ -59,6 +68,7 @@ OpenClaw Gateway (ws://127.0.0.1:18789)
 | Platform | Android / iOS |
 | Language | C# (.NET) |
 | AI Orchestration | OpenClaw 2026.2.21 |
+| Communication | Telegram Bot (agent ↔ human) |
 | Image Generation | ComfyUI (local) |
 | Music Generation | Suno (via MCP) |
 | Loop Processing | PyMusicLooper |
@@ -75,6 +85,7 @@ roguelike-survivor/
 ├── AI_DEV_RULES.md         # Rules for AI agents (branch strategy, verification)
 ├── BACKLOG.md              # Issue-level task backlog with acceptance criteria
 ├── WORKING.md              # Shared task board (agent status tracking)
+├── BOOTSTRAP.md              # OpenClaw initial instruction (paste to architect)
 ├── AGENTS.md               # Agent roles, git protocol, communication
 ├── SECURITY.md             # API key management, security policy
 ├── CHEATSHEET_*.md         # Quick reference for OpenClaw, MCP, Unity

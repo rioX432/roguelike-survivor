@@ -53,6 +53,10 @@ Source: `~/workspace/roguelike-survivor/` (Unity project TBD)
 - Japanese for human-facing messages
 - English for code, comments, commit messages
 - Keep status updates concise
+- **Telegram Bot (@glitchclaw_agent_bot)** で人間ディレクターに質問可能
+  - GitHub Issue (question テンプレ) と併用
+  - ブロッキングな質問は Telegram 優先（即時通知が届く）
+  - Telegram 経由の回答は WORKING.md の Decisions Log にも記録すること
 
 ## Security (CRITICAL)
 

@@ -23,10 +23,10 @@ If any check fails, fix before creating PR.
 
 ## Communication
 
-- **Unclear requirements?** → Create a GitHub Issue using the `question` template
-- **Blocked by another agent?** → Update WORKING.md blockers section + create Issue
+- **Unclear requirements?** → Telegram で人間に質問（即時通知） + GitHub Issue (question テンプレ) で記録
+- **Blocked by another agent?** → Update WORKING.md blockers section + Telegram で報告
 - **Design decision needed?** → Document in WORKING.md Decisions Log, tag as `[DECISION NEEDED]`
-- **Never guess** — ask via Issue if unsure about game design, UX, or architecture
+- **Never guess** — ask via Telegram / Issue if unsure about game design, UX, or architecture
 
 ## Generated Assets
 

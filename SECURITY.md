@@ -2,7 +2,7 @@
 
 ## API Keys & Secrets
 
-- API keys (Anthropic, GitHub PAT) are configured in mcporter/OpenClaw config ONLY
+- API keys (Anthropic, GitHub PAT, Telegram Bot Token) are configured in mcporter/OpenClaw config ONLY
 - NEVER echo, print, log, or expose any API key or token in:
   - Terminal output
   - Git commits
@@ -53,6 +53,7 @@
 
 - [ ] Revoke Anthropic API key
 - [ ] Revoke GitHub PAT
+- [ ] Revoke Telegram Bot Token (@BotFather → /deletebot or /revoke)
 - [ ] Stop and remove Docker containers
 - [ ] Stop OpenClaw gateway daemon
 - [ ] Clear mcporter credentials
