@@ -5,12 +5,32 @@ set -euo pipefail
 # Usage: tools/android_smoke.sh
 # Called by OpenClaw agents after builds to verify on-device behavior.
 
-UNITY="/Users/hackathon/workspace/6000.3.9f1/Unity.app/Contents/MacOS/Unity"
+# --- Unity path detection ---
+# Priority: $UNITY_PATH env > Unity Hub default locations > PATH
+if [ -n "${UNITY_PATH:-}" ]; then
+    UNITY="$UNITY_PATH"
+elif [ -x "/Applications/Unity/Hub/Editor/6000.3.9f1/Unity.app/Contents/MacOS/Unity" ]; then
+    UNITY="/Applications/Unity/Hub/Editor/6000.3.9f1/Unity.app/Contents/MacOS/Unity"
+elif command -v unity-editor &>/dev/null; then
+    UNITY="$(command -v unity-editor)"
+else
+    # Fallback: search common workspace locations
+    for candidate in "$HOME/workspace"/6000.*/Unity.app/Contents/MacOS/Unity; do
+        if [ -x "$candidate" ]; then UNITY="$candidate"; break; fi
+    done
+fi
+
+if [ -z "${UNITY:-}" ] || [ ! -x "$UNITY" ]; then
+    echo "FAIL: Unity editor not found."
+    echo "Set UNITY_PATH env or install via Unity Hub."
+    exit 1
+fi
+
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 GAME_DIR="$PROJECT_DIR/roguelike-survivor-game"
 BUILD_DIR="$PROJECT_DIR/build/android"
 APK_PATH="$BUILD_DIR/GlitchClaw.apk"
-PKG="com.glitchclaw.game"  # TODO: update to actual bundleId
+PKG="com.glitchclaw.survivor"
 LOG_DIR="$BUILD_DIR/logs"
 
 mkdir -p "$BUILD_DIR" "$LOG_DIR"
