@@ -100,12 +100,6 @@ game soundtrack, loopable
 | level_up | キラキラした上昇音 |
 | player_hit | 柔らかいダメージ音（ちいかわ的な「ワッ」に近い音） |
 
-## Game Name Candidates
+## Game Name
 
-| Name | Concept |
-|---|---|
-| **NeonPaw** | ネオン + 肉球、サイバーパンク×かわいいの象徴 |
-| **ByteBiter** | バイト（データ）を噛む小さな生き物 |
-| **Glitch Survivors** | グリッチ（バグ）の世界のサバイバー |
-| **Neon Critters** | ネオン街の小さな生き物たち |
-| **CyberPaws** | サイバー + 肉球 |
+**GlitchClaw** — AI世界のグリッチ（バグ）として生まれた爪を持つ小さな生き物。
