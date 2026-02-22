@@ -51,11 +51,11 @@ Base class: `EnemyBase : MonoBehaviour, IPoolable`
 
 | Type | Behavior | HP | Speed | Spawn Phase |
 |---|---|---|---|---|
-| Slime | Walk toward player | Low | Slow | 0:00~ |
-| Bat | Walk toward player (faster) | Low | Fast | 1:00~ |
-| Skeleton | Walk toward player | Medium | Medium | 3:00~ |
-| Elite Golem | Walk toward player, high HP | High | Slow | 5:00~ |
-| Boss Dragon | Walk toward player, very high HP | Very High | Medium | 8:00~ |
+| Bit Drone | Hover toward player | Low | Slow | 0:00~ |
+| Glitch Bug | Rush toward player (fast) | Low | Fast | 1:00~ |
+| Rust Walker | Walk toward player | Medium | Medium | 3:00~ |
+| Siege Core | Walk toward player, shielded | High | Slow | 5:00~ |
+| Overlord AI | Float toward player, tentacles | Very High | Medium | 8:00~ |
 
 - All enemies use simple chase AI: `(player.position - transform.position).normalized`
 - Damage on contact with player (OnTriggerEnter2D)

@@ -7,6 +7,7 @@ Source: `~/workspace/roguelike-survivor/` (Unity project TBD)
 
 ## Documents (ALWAYS read before acting)
 
+- `CONCEPT.md` — Game concept, world, character design, art/audio direction
 - `PLAN.md` — Timeline, MVP scope, task checklist
 - `SYSTEM_DESIGN.md` — Technical spec, ScriptableObject schemas, system architecture
 - `CLAUDE.md` — Coding conventions, architecture constraints, project structure
