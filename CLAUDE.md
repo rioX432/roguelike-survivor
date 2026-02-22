@@ -1,0 +1,121 @@
+# Roguelike Survivor — Project Instructions
+
+## Overview
+
+Unity 6 (URP 2D) portrait-mode survivors-like game. Android / iOS target.
+8-hour hackathon project built with OpenClaw multi-agent orchestration.
+
+## Agent Roles
+
+| Agent | Responsibility | Scope |
+|---|---|---|
+| architect | PM, task decomposition, asset generation (ComfyUI), progress tracking | PLAN.md, SYSTEM_DESIGN.md, asset pipeline |
+| builder-alpha | Player, camera, UI, attack modules | Scripts: Player*, Camera*, UI*, Attack* |
+| builder-beta | Enemy AI, wave control, data (ScriptableObject) | Scripts: Enemy*, Spawn*, Data/, SO assets |
+| reviewer | QA, perf monitoring, code review | All scripts (read-only analysis) |
+
+## Git Rules
+
+- **Scene files**: Only builder-alpha edits scene files
+- **builder-beta**: Only edits Prefabs, ScriptableObjects, and scripts under Enemy/Spawn/Data
+- Commit per feature, always include `.meta` files
+- Never commit secrets or API keys
+
+## C# Coding Conventions
+
+- Namespace: `RoguelikeSurvivor`
+- One MonoBehaviour per file, filename matches class name
+- Use `[SerializeField] private` instead of `public` fields
+- Prefer `TryGetComponent<T>()` over `GetComponent<T>()`
+- No `Find()` or `FindObjectOfType()` at runtime — use dependency injection or direct references
+- Avoid `new` allocations in `Update()` / `FixedUpdate()` — cache everything
+- Use `CompareTag("Enemy")` instead of `gameObject.tag == "Enemy"`
+
+## Architecture Constraints
+
+### Entity Management
+- GameObject + Object Pool (no ECS / Jobs System unless perf requires it)
+- All pooled objects implement `IPoolable` interface with `OnSpawn()` / `OnDespawn()`
+
+### Infinite Map
+- 3x3 chunk ring buffer — move chunk `Transform.position`, never use `Tilemap.SetTile()` dynamically
+- Chunks are plain SpriteRenderers with tiled background sprites
+
+### Data
+- All master data as ScriptableObject (no JSON parsing at runtime)
+- Schema files: `EnemyData`, `WeaponData`, `SpawnTableData`, `WaveData`
+
+### UI
+- Split Canvases: `Canvas_Static` (background, buttons) / `Canvas_Dynamic` (timer, HP bar, XP bar)
+- Never put frequently-updated elements on the same Canvas as static elements
+
+### Input
+- New InputSystem with virtual joystick for mobile
+- `PlayerInputActions.inputactions` asset as single source of truth
+
+### Object Pool
+- Centralized `PoolManager` singleton
+- Pre-warm pools in scene load, not during gameplay
+- Pool size configs via ScriptableObject
+
+## Project Structure (Target)
+
+```
+Assets/
+  Scripts/
+    Core/           # GameManager, PoolManager, EventBus
+    Player/         # PlayerController, PlayerStats
+    Camera/         # CameraFollow
+    Attack/         # AttackModule (base), RadialAttack, ConeAttack, HomingAttack
+    Enemy/          # EnemyBase, EnemyAI, EnemySpawner
+    Data/           # ScriptableObject definitions
+    UI/             # UIManager, HPBar, XPBar, TimerUI, ResultScreen, LevelUpPanel
+    Map/            # InfiniteMapController, ChunkManager
+    Audio/          # AudioManager, BGMController
+  ScriptableObjects/
+    Enemies/        # EnemyData assets
+    Weapons/        # WeaponData assets
+    Waves/          # SpawnTableData, WaveData assets
+  Prefabs/
+    Player/
+    Enemies/
+    Projectiles/
+    Effects/
+    UI/
+  Art/
+    Sprites/        # ComfyUI generated pixel art
+    Backgrounds/
+  Audio/
+    BGM/
+    SE/
+  Scenes/
+    MainGame.unity
+    Result.unity
+```
+
+## Performance Budgets
+
+- Target: 60 FPS on mid-range mobile (Snapdragon 7xx / A14)
+- Max simultaneous active enemies: 500 (pooled)
+- Max active projectiles: 200 (pooled)
+- GC Alloc per frame: < 1KB
+- Draw calls: < 100 (use SpriteAtlas)
+
+## Build Commands
+
+```bash
+# Android APK (from Unity CLI)
+Unity -batchmode -projectPath . -executeMethod BuildScript.BuildAndroid -quit
+
+# iOS Xcode project
+Unity -batchmode -projectPath . -executeMethod BuildScript.BuildiOS -quit
+```
+
+## Do NOT
+
+- Use `DontDestroyOnLoad` excessively — only GameManager and AudioManager
+- Use coroutines for game logic timing — use a central timer in GameManager
+- Parse JSON at runtime for game data
+- Allocate in hot paths (Update, FixedUpdate, OnTriggerEnter2D)
+- Create new GameObjects during gameplay — always pool
+- Edit MainGame.unity from builder-beta (scene conflicts)

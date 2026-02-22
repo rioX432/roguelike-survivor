@@ -47,3 +47,9 @@ progress.txt
 
 # Secrets
 *.env
+*.key
+*.pem
+credentials.*
+openclaw.json
+mcporter.json
+.openclaw/
