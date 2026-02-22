@@ -53,3 +53,12 @@ credentials.*
 openclaw.json
 mcporter.json
 .openclaw/
+
+# OpenClaw workspace auto-generated files
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+.pi/
