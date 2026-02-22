@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace RoguelikeSurvivor
 {
@@ -8,13 +9,13 @@ namespace RoguelikeSurvivor
         public static event Action<int> OnLevelUp;
         public static event Action OnPlayerDeath;
         public static event Action OnGameOver;
-        public static event Action<EnemyBase> OnEnemyDeath;
+        public static event Action<GameObject> OnEnemyDeath;
 
         public static void RaiseXPCollected(int amount) => OnXPCollected?.Invoke(amount);
         public static void RaiseLevelUp(int level) => OnLevelUp?.Invoke(level);
         public static void RaisePlayerDeath() => OnPlayerDeath?.Invoke();
         public static void RaiseGameOver() => OnGameOver?.Invoke();
-        public static void RaiseEnemyDeath(EnemyBase enemy) => OnEnemyDeath?.Invoke(enemy);
+        public static void RaiseEnemyDeath(GameObject enemy) => OnEnemyDeath?.Invoke(enemy);
 
         public static void Clear()
         {
