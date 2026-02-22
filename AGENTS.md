@@ -11,6 +11,7 @@ Source: `~/workspace/roguelike-survivor/` (Unity project TBD)
 - `PLAN.md` — Timeline, MVP scope, task checklist
 - `SYSTEM_DESIGN.md` — Technical spec, ScriptableObject schemas, system architecture
 - `CLAUDE.md` — Coding conventions, architecture constraints, project structure
+- `WORKING.md` — Shared task board (READ and UPDATE every session)
 
 ## Agent Roles
 
