@@ -10,7 +10,7 @@ namespace RoguelikeSurvivor
         public static AudioManager Instance { get; private set; }
 
         [SerializeField] private AudioSource _bgmSource;
-        [SerializeField] private AudioSource[] _sePool;  // 6 SE sources
+        [SerializeField] private AudioSource[] _sePool;  // 6 SE sources recommended
 
         [Header("BGM")]
         [SerializeField] private AudioClip _bgmClip;
@@ -32,21 +32,28 @@ namespace RoguelikeSurvivor
             DontDestroyOnLoad(gameObject);
         }
 
+        private void OnEnable()
+        {
+            EventBus.OnEnemyDeath += HandleEnemyDeath;
+            EventBus.OnLevelUp += HandleLevelUp;
+            EventBus.OnPlayerDeath += HandlePlayerDeath;
+        }
+
+        private void OnDisable()
+        {
+            EventBus.OnEnemyDeath -= HandleEnemyDeath;
+            EventBus.OnLevelUp -= HandleLevelUp;
+            EventBus.OnPlayerDeath -= HandlePlayerDeath;
+        }
+
         private void Start()
         {
             PlayBGM();
-
-            EventBus.OnEnemyDeath += _ => PlaySE(_seEnemyDie);
-            EventBus.OnLevelUp += _ => PlaySE(_seLevelUp);
-            EventBus.OnPlayerDeath += () => StopBGM();
         }
 
-        private void OnDestroy()
-        {
-            EventBus.OnEnemyDeath -= _ => PlaySE(_seEnemyDie);
-            EventBus.OnLevelUp -= _ => PlaySE(_seLevelUp);
-            EventBus.OnPlayerDeath -= () => StopBGM();
-        }
+        private void HandleEnemyDeath(GameObject _) => PlaySE(_seEnemyDie);
+        private void HandleLevelUp(int _) => PlaySE(_seLevelUp);
+        private void HandlePlayerDeath() => StopBGM();
 
         public void PlayBGM()
         {
@@ -65,14 +72,12 @@ namespace RoguelikeSurvivor
         public void PlaySE(AudioClip clip)
         {
             if (clip == null || _sePool == null || _sePool.Length == 0) return;
-
-            // Round-robin pool to prevent cut-off on rapid hits
             var source = _sePool[_seIndex % _sePool.Length];
             _seIndex++;
             source.PlayOneShot(clip);
         }
 
-        // Convenience wrappers for easy call from code
+        // Convenience wrappers
         public void PlayAttackFire() => PlaySE(_seAttackFire);
         public void PlayEnemyHit() => PlaySE(_seEnemyHit);
         public void PlayEnemyDie() => PlaySE(_seEnemyDie);
