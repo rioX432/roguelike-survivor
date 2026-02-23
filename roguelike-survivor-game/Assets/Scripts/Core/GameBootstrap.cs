@@ -269,6 +269,7 @@ namespace RoguelikeSurvivor
         {
             yield return null;
             if (PoolManager.Instance == null) yield break;
+            EnemyBase.ActiveEnemies.Clear(); // reset static cache on (re)start
             PoolManager.Instance.PreWarm(_enemyPrefabGO, 100);  // max simultaneous ~82
             PoolManager.Instance.PreWarm(_projectilePrefabGO, 80);
             PoolManager.Instance.PreWarm(_xpGemPrefabGO, 60);

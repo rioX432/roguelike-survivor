@@ -6,6 +6,10 @@ namespace RoguelikeSurvivor
     [RequireComponent(typeof(Rigidbody2D))]
     public class EnemyBase : MonoBehaviour, IPoolable
     {
+        /// <summary>Zero-GC cache of all currently active enemies. Updated on Initialize/OnDespawn.</summary>
+        public static readonly System.Collections.Generic.List<EnemyBase> ActiveEnemies
+            = new System.Collections.Generic.List<EnemyBase>(128);
+
         [SerializeField] private GameObject _xpGemPrefab;
 
         private EnemyData _data;
@@ -41,6 +45,7 @@ namespace RoguelikeSurvivor
                 if (_spriteRenderer != null)
                     _spriteRenderer.color = Color.white;
             }
+            if (!ActiveEnemies.Contains(this)) ActiveEnemies.Add(this);
         }
 
         private void Awake()
@@ -65,6 +70,7 @@ namespace RoguelikeSurvivor
         {
             _isDead = false;
             _moveDir = Vector2.zero;
+            ActiveEnemies.Remove(this);
         }
 
         private void FixedUpdate()
