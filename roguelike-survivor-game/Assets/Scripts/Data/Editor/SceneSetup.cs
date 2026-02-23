@@ -39,6 +39,10 @@ namespace RoguelikeSurvivor
             var sources = audioGO.GetComponents<AudioSource>();
             for (int i = 0; i < 6 && i + 1 < sources.Length; i++)
                 sePoolProp.GetArrayElementAtIndex(i).objectReferenceValue = sources[i + 1];
+            // Auto-assign BGM clip
+            var bgmClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Audio/BGM/Crimson_banners_of_the_Sunken_Isles.mp3");
+            if (bgmClip != null)
+                serialized.FindProperty("_bgmClip").objectReferenceValue = bgmClip;
             serialized.ApplyModifiedProperties();
 
             var levelUpGO = CreateManager<LevelUpSystem>("LevelUpSystem");
