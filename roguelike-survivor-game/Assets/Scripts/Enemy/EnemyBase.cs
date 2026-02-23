@@ -158,13 +158,6 @@ namespace RoguelikeSurvivor
             }
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (_isDead || _data == null) return;
-            if (!other.CompareTag("Player")) return;
-
-            if (other.TryGetComponent<PlayerStats>(out var stats))
-                stats.TakeDamage(_data.contactDamage);
-        }
+        // 接触ダメージなし（ゲームデザイン上不要のため削除）
     }
 }
