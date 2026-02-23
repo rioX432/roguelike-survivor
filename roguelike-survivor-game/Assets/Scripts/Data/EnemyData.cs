@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace RoguelikeSurvivor
 {
+    public enum EnemyMovePattern { Chase, Zigzag, Surround }
+
     [CreateAssetMenu(menuName = "Data/EnemyData")]
     public class EnemyData : ScriptableObject
     {
@@ -12,5 +14,6 @@ namespace RoguelikeSurvivor
         public float contactDamage;
         public float xpDrop;
         public float scale = 1f;
+        public EnemyMovePattern movePattern = EnemyMovePattern.Chase;
     }
 }

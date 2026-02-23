@@ -30,14 +30,9 @@ namespace RoguelikeSurvivor
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _background.parent as RectTransform,
-                eventData.position,
-                eventData.pressEventCamera,
-                out Vector2 localPoint))
-            {
-                _background.anchoredPosition = localPoint;
-            }
+            // Fixed joystick: don't move the background to avoid bottom-edge issues
+            // Reset handle to center on new touch
+            _handle.anchoredPosition = Vector2.zero;
             OnDrag(eventData);
         }
 

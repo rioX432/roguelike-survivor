@@ -18,6 +18,8 @@ namespace RoguelikeSurvivor
 
         // Cached direction — no allocation in FixedUpdate
         private Vector2 _moveDir;
+        private float _patternTimer;
+        private float _zigzagSign = 1f;
 
         public EnemyData Data => _data;
 
@@ -69,10 +71,37 @@ namespace RoguelikeSurvivor
         {
             if (_isDead || _data == null || _playerTransform == null) return;
 
-            // Chase AI: move toward player — no allocation
-            _moveDir = (Vector2)(_playerTransform.position - transform.position);
-            if (_moveDir.sqrMagnitude > 0.01f)
-                _moveDir.Normalize();
+            _patternTimer += Time.fixedDeltaTime;
+            Vector2 toPlayer = (Vector2)(_playerTransform.position - transform.position);
+            float dist = toPlayer.magnitude;
+
+            switch (_data.movePattern)
+            {
+                case EnemyMovePattern.Zigzag:
+                    // Zigzag perpendicular to player direction every 0.4s
+                    if (_patternTimer > 0.4f) { _zigzagSign = -_zigzagSign; _patternTimer = 0f; }
+                    if (dist > 0.1f)
+                    {
+                        Vector2 perpendicular = new Vector2(-toPlayer.y, toPlayer.x).normalized;
+                        _moveDir = (toPlayer.normalized + perpendicular * _zigzagSign * 0.7f).normalized;
+                    }
+                    break;
+
+                case EnemyMovePattern.Surround:
+                    // Approach then orbit at distance 3
+                    if (dist > 3.5f)
+                        _moveDir = toPlayer.normalized;
+                    else
+                    {
+                        Vector2 orbit = new Vector2(-toPlayer.y, toPlayer.x).normalized;
+                        _moveDir = (toPlayer.normalized * 0.3f + orbit * 0.7f).normalized;
+                    }
+                    break;
+
+                default: // Chase
+                    _moveDir = dist > 0.1f ? toPlayer.normalized : Vector2.zero;
+                    break;
+            }
 
             _rb.MovePosition(_rb.position + _moveDir * (_data.moveSpeed * Time.fixedDeltaTime));
         }

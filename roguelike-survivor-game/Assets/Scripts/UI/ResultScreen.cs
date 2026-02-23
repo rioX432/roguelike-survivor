@@ -70,6 +70,11 @@ namespace RoguelikeSurvivor
         {
             Time.timeScale = 1f;
             EventBus.Clear();
+            // Destroy DontDestroyOnLoad singletons so Bootstrap re-runs cleanly
+            if (GameManager.Instance != null)    Destroy(GameManager.Instance.gameObject);
+            if (PoolManager.Instance != null)    Destroy(PoolManager.Instance.gameObject);
+            if (AudioManager.Instance != null)   Destroy(AudioManager.Instance.gameObject);
+            if (LevelUpSystem.Instance != null)  Destroy(LevelUpSystem.Instance.gameObject);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }

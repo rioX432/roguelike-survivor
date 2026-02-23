@@ -152,9 +152,15 @@ namespace RoguelikeSurvivor
 
             _playerGO.AddComponent<PlayerXP>();
 
-            // Start with radial attack
+            // Start with multiple attack types for more variety
             var radial = _playerGO.AddComponent<RadialAttack>();
             radial.SetData(MakeWeapon("Radial Burst", AttackType.Radial, 20f, 1.5f, 9f, 9f, 8));
+
+            var cone = _playerGO.AddComponent<ConeAttack>();
+            cone.SetData(MakeWeapon("Cone Shot", AttackType.Cone, 30f, 0.8f, 12f, 10f, 5));
+
+            var homing = _playerGO.AddComponent<HomingAttack>();
+            homing.SetData(MakeWeapon("Homing Strike", AttackType.Homing, 40f, 2.0f, 8f, 15f, 2));
         }
 
         // ─── Camera ────────────────────────────────────────────────────────
@@ -270,11 +276,11 @@ namespace RoguelikeSurvivor
             var table = ScriptableObject.CreateInstance<SpawnTableData>();
             table.waves = new List<WaveEntry>
             {
-                new WaveEntry { timeStart=0f,  timeEnd=60f,  enemyData=MakeEnemy("Bit Drone",   10f, 2.5f, 5f,  3f, 2.0f, "enemy_bit_drone"),   spawnRate=0.8f, maxActive=20 },
-                new WaveEntry { timeStart=30f, timeEnd=180f, enemyData=MakeEnemy("Glitch Bug",  20f, 3.2f, 8f,  6f, 1.8f, "enemy_glitch_bug"),   spawnRate=0.5f, maxActive=15 },
-                new WaveEntry { timeStart=120f,timeEnd=360f, enemyData=MakeEnemy("Rust Walker", 50f, 1.8f, 12f, 10f,2.5f, "enemy_rust_walker"),  spawnRate=0.3f, maxActive=10 },
-                new WaveEntry { timeStart=240f,timeEnd=480f, enemyData=MakeEnemy("Siege Core",  100f,1.2f, 18f, 15f,3.5f, "enemy_siege_core"),   spawnRate=0.2f, maxActive=6  },
-                new WaveEntry { timeStart=420f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 300f,1.0f, 25f, 30f,5.0f, "enemy_overlord_ai"),  spawnRate=0.1f, maxActive=3  },
+                new WaveEntry { timeStart=0f,  timeEnd=120f, enemyData=MakeEnemy("Bit Drone",   10f,  2.5f, 5f,  3f, 2.0f, "enemy_bit_drone",  EnemyMovePattern.Chase),    spawnRate=1.5f, maxActive=30 },
+                new WaveEntry { timeStart=20f, timeEnd=240f, enemyData=MakeEnemy("Glitch Bug",  18f,  4.0f, 6f,  5f, 1.8f, "enemy_glitch_bug",  EnemyMovePattern.Zigzag),   spawnRate=1.2f, maxActive=25 },
+                new WaveEntry { timeStart=90f, timeEnd=420f, enemyData=MakeEnemy("Rust Walker", 60f,  2.0f, 12f, 10f,2.5f, "enemy_rust_walker", EnemyMovePattern.Chase),    spawnRate=0.8f, maxActive=15 },
+                new WaveEntry { timeStart=180f,timeEnd=540f, enemyData=MakeEnemy("Siege Core",  120f, 1.4f, 18f, 15f,3.5f, "enemy_siege_core",  EnemyMovePattern.Surround), spawnRate=0.5f, maxActive=8  },
+                new WaveEntry { timeStart=360f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 350f, 1.2f, 25f, 30f,5.0f, "enemy_overlord_ai", EnemyMovePattern.Chase),    spawnRate=0.3f, maxActive=4  },
             };
 
             // Register enemy prefab for each enemy type (all share base prefab, Initialize sets stats)
@@ -487,7 +493,8 @@ namespace RoguelikeSurvivor
 
         private static EnemyData MakeEnemy(string enemyName,
             float hp, float speed, float contactDmg, float xp, float scale,
-            string spriteName = null)
+            string spriteName = null,
+            EnemyMovePattern pattern = EnemyMovePattern.Chase)
         {
             var d = ScriptableObject.CreateInstance<EnemyData>();
             d.enemyName = enemyName;
@@ -496,6 +503,7 @@ namespace RoguelikeSurvivor
             d.contactDamage = contactDmg;
             d.xpDrop = xp;
             d.scale = scale;
+            d.movePattern = pattern;
             if (spriteName != null) d.sprite = LoadSprite(spriteName);
             return d;
         }
