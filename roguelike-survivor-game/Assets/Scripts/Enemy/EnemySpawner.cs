@@ -11,8 +11,8 @@ namespace RoguelikeSurvivor
     {
         [SerializeField] private SpawnTableData _spawnTable;
         [SerializeField] private Transform _player;
-        [SerializeField] private float _spawnRadius = 12f;     // distance from player
-        [SerializeField] private float _despawnRadius = 20f;   // despawn if too far
+        [SerializeField] private float _spawnRadius = 8f;      // distance from player (camera ortho=6)
+        [SerializeField] private float _despawnRadius = 18f;   // despawn if too far
 
         // Prefabs keyed by EnemyData asset name — wire up in Inspector
         [SerializeField] private List<EnemyPrefabEntry> _enemyPrefabs = new();

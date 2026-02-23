@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering.Universal;
@@ -50,6 +51,20 @@ namespace RoguelikeSurvivor
         // ─── Managers ──────────────────────────────────────────────────────
         private void CreateManagers()
         {
+            // Force-init TMP_Settings so TextMeshProUGUI works at runtime without asset file
+            try
+            {
+                var existing = Resources.Load<TMP_Settings>("TMP Settings");
+                if (existing == null)
+                {
+                    var s = ScriptableObject.CreateInstance<TMP_Settings>();
+                    var field = typeof(TMP_Settings).GetField("s_Instance",
+                        BindingFlags.Static | BindingFlags.NonPublic);
+                    field?.SetValue(null, s);
+                }
+            }
+            catch { /* TMP not available, text labels will be absent */ }
+
             // URP 2D: Global Light required for all sprites to be visible
             var lightGO = new GameObject("GlobalLight2D");
             var light = lightGO.AddComponent<Light2D>();
@@ -112,6 +127,7 @@ namespace RoguelikeSurvivor
         {
             _playerGO = new GameObject("Player");
             _playerGO.tag = "Player";
+            _playerGO.transform.localScale = Vector3.one * 2.5f; // scale up for mobile visibility
 
             var rb = _playerGO.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f; rb.freezeRotation = true;
@@ -241,11 +257,11 @@ namespace RoguelikeSurvivor
             var table = ScriptableObject.CreateInstance<SpawnTableData>();
             table.waves = new List<WaveEntry>
             {
-                new WaveEntry { timeStart=0f,  timeEnd=60f,  enemyData=MakeEnemy("Bit Drone",   10f, 2.5f, 5f,  3f, 0.8f),  spawnRate=0.8f, maxActive=20 },
-                new WaveEntry { timeStart=30f, timeEnd=180f, enemyData=MakeEnemy("Glitch Bug",  20f, 3.2f, 8f,  6f, 1.0f),  spawnRate=0.5f, maxActive=15 },
-                new WaveEntry { timeStart=120f,timeEnd=360f, enemyData=MakeEnemy("Rust Walker", 50f, 1.8f, 12f, 10f,1.3f),  spawnRate=0.3f, maxActive=10 },
-                new WaveEntry { timeStart=240f,timeEnd=480f, enemyData=MakeEnemy("Siege Core",  100f,1.2f, 18f, 15f,1.6f),  spawnRate=0.2f, maxActive=6  },
-                new WaveEntry { timeStart=420f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 300f,1.0f, 25f, 30f,2.0f),  spawnRate=0.1f, maxActive=3  },
+                new WaveEntry { timeStart=0f,  timeEnd=60f,  enemyData=MakeEnemy("Bit Drone",   10f, 2.5f, 5f,  3f, 2.0f),  spawnRate=0.8f, maxActive=20 },
+                new WaveEntry { timeStart=30f, timeEnd=180f, enemyData=MakeEnemy("Glitch Bug",  20f, 3.2f, 8f,  6f, 1.8f),  spawnRate=0.5f, maxActive=15 },
+                new WaveEntry { timeStart=120f,timeEnd=360f, enemyData=MakeEnemy("Rust Walker", 50f, 1.8f, 12f, 10f,2.5f),  spawnRate=0.3f, maxActive=10 },
+                new WaveEntry { timeStart=240f,timeEnd=480f, enemyData=MakeEnemy("Siege Core",  100f,1.2f, 18f, 15f,3.5f),  spawnRate=0.2f, maxActive=6  },
+                new WaveEntry { timeStart=420f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 300f,1.0f, 25f, 30f,5.0f),  spawnRate=0.1f, maxActive=3  },
             };
 
             // Register enemy prefab for each enemy type (all share base prefab, Initialize sets stats)

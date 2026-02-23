@@ -26,6 +26,13 @@ namespace RoguelikeSurvivor
         {
             _data = data;
             _playerTransform = playerTransform;
+            // Re-run spawn setup now that data is available (OnSpawn ran before Initialize)
+            if (_data != null)
+            {
+                _currentHP = _data.maxHP;
+                _isDead = false;
+                transform.localScale = Vector3.one * _data.scale;
+            }
         }
 
         private void Awake()
