@@ -25,14 +25,10 @@ namespace RoguelikeSurvivor
             _fullRange = range;
         }
 
-        private bool IsPlaying =>
-            GameManager.Instance != null &&
-            GameManager.Instance.CurrentState == GameState.Playing;
-
         public void OnPointerDown(PointerEventData eventData)
         {
-            // ゲームプレイ中のみ受け付ける（GameOver/LevelUpではボタン優先）
-            if (!IsPlaying) return;
+            // Canvas sortingOrder=50 のパネル(LevelUp/GameOver)が前面にある間は
+            // そちらのRaycasterが先にブロックするため、ここではガード不要
             _touchOrigin = eventData.position;
             _isTouching = true;
             Direction = Vector2.zero;
@@ -40,7 +36,7 @@ namespace RoguelikeSurvivor
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!_isTouching || !IsPlaying) return;
+            if (!_isTouching) return;
 
             Vector2 delta = eventData.position - _touchOrigin;
             float magnitude = delta.magnitude;
