@@ -77,7 +77,7 @@ namespace RoguelikeSurvivor
             erb.gravityScale = 0f; erb.freezeRotation = true;
             var ec = _enemyPrefabGO.AddComponent<CircleCollider2D>();
             ec.radius = 0.45f; ec.isTrigger = true;
-            _enemyPrefabGO.AddComponent<SpriteRenderer>().sprite = CircleSprite(40, new Color(1f, 0.2f, 0.2f));
+            _enemyPrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("enemy_bit_drone") ?? CircleSprite(40, new Color(1f, 0.2f, 0.2f));
             _enemyPrefabGO.tag = "Enemy";
             _enemyPrefabGO.AddComponent<EnemyBase>(); // xpGemPrefab set after _xpGemPrefabGO created
             _enemyPrefabGO.SetActive(false);
@@ -88,7 +88,7 @@ namespace RoguelikeSurvivor
             prb.gravityScale = 0f; prb.freezeRotation = true;
             var pc = _projectilePrefabGO.AddComponent<CircleCollider2D>();
             pc.radius = 0.15f; pc.isTrigger = true;
-            _projectilePrefabGO.AddComponent<SpriteRenderer>().sprite = CircleSprite(10, Color.cyan);
+            _projectilePrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("projectile") ?? CircleSprite(10, Color.cyan);
             _projectilePrefabGO.AddComponent<Projectile>();
             _projectilePrefabGO.SetActive(false);
             Projectile.RegisterPrefab(_projectilePrefabGO);
@@ -99,7 +99,7 @@ namespace RoguelikeSurvivor
             grb.gravityScale = 0f;
             var gc = _xpGemPrefabGO.AddComponent<CircleCollider2D>();
             gc.radius = 0.25f; gc.isTrigger = true;
-            _xpGemPrefabGO.AddComponent<SpriteRenderer>().sprite = DiamondSprite(16, Color.yellow);
+            _xpGemPrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("xp_gem") ?? DiamondSprite(16, Color.yellow);
             _xpGemPrefabGO.AddComponent<XPGem>();
             _xpGemPrefabGO.SetActive(false);
 
@@ -116,7 +116,7 @@ namespace RoguelikeSurvivor
             var rb = _playerGO.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f; rb.freezeRotation = true;
             _playerGO.AddComponent<CircleCollider2D>().radius = 0.45f;
-            _playerGO.AddComponent<SpriteRenderer>().sprite = CircleSprite(56, new Color(0.5f, 0.8f, 1f));
+            _playerGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("player") ?? CircleSprite(56, new Color(0.5f, 0.8f, 1f));
 
             var stats = _playerGO.AddComponent<PlayerStats>();
             var ctrl = _playerGO.AddComponent<PlayerController>();
@@ -162,7 +162,8 @@ namespace RoguelikeSurvivor
             var mapGO = new GameObject("Map");
             var ctrl = mapGO.AddComponent<InfiniteMapController>();
             ctrl.SetPlayer(_playerGO.transform);
-            ctrl.SetTile(MakeMapTile(256, 256));
+            var bgSprite = LoadSprite("bg_tile");
+            ctrl.SetTile(bgSprite != null ? bgSprite : MakeMapTile(256, 256));
         }
 
         // ─── HUD Canvas ────────────────────────────────────────────────────
@@ -477,6 +478,15 @@ namespace RoguelikeSurvivor
             MakeWeapon("Wide Cone",      AttackType.Cone,    20f, 0.6f, 11f, 12f, 7),
             MakeWeapon("Multi-Homing",   AttackType.Homing,  25f, 1.0f, 9f,  18f, 5),
         };
+
+        // ─── Resource Sprite Loader ────────────────────────────────────────
+
+        private static Sprite LoadSprite(string name)
+        {
+            var sp = Resources.Load<Sprite>($"Sprites/{name}");
+            if (sp != null) Debug.Log($"[GameBootstrap] Loaded sprite: {name}");
+            return sp;
+        }
 
         // ─── Sprite Factories ──────────────────────────────────────────────
 
