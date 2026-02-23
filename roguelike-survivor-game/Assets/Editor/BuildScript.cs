@@ -31,7 +31,7 @@ public static class BuildScript
             scenes = GameScenes,
             locationPathName = "../build/android/GlitchClaw.apk",
             target = BuildTarget.Android,
-            options = BuildOptions.CompressWithLz4HC
+            options = BuildOptions.Development | BuildOptions.AllowDebugging
         };
 
         PlayerSettings.SetApplicationIdentifier(
