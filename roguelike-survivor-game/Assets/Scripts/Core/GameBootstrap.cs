@@ -77,7 +77,7 @@ namespace RoguelikeSurvivor
             erb.gravityScale = 0f; erb.freezeRotation = true;
             var ec = _enemyPrefabGO.AddComponent<CircleCollider2D>();
             ec.radius = 0.45f; ec.isTrigger = true;
-            AddUnlitSR(_enemyPrefabGO).sprite = LoadSprite("enemy_bit_drone") ?? CircleSprite(40, new Color(1f, 0.2f, 0.2f));
+            var esr = AddUnlitSR(_enemyPrefabGO); esr.sprite = LoadSprite("enemy_bit_drone") ?? CircleSprite(40, new Color(1f, 0.2f, 0.2f)); esr.sortingOrder = 2;
             _enemyPrefabGO.tag = "Enemy";
             _enemyPrefabGO.AddComponent<EnemyBase>(); // xpGemPrefab set after _xpGemPrefabGO created
             _enemyPrefabGO.SetActive(false);
@@ -88,7 +88,7 @@ namespace RoguelikeSurvivor
             prb.gravityScale = 0f; prb.freezeRotation = true;
             var pc = _projectilePrefabGO.AddComponent<CircleCollider2D>();
             pc.radius = 0.15f; pc.isTrigger = true;
-            AddUnlitSR(_projectilePrefabGO).sprite = LoadSprite("projectile") ?? CircleSprite(10, Color.cyan);
+            var psr = AddUnlitSR(_projectilePrefabGO); psr.sprite = LoadSprite("projectile") ?? CircleSprite(10, Color.cyan); psr.sortingOrder = 3;
             _projectilePrefabGO.AddComponent<Projectile>();
             _projectilePrefabGO.SetActive(false);
             Projectile.RegisterPrefab(_projectilePrefabGO);
@@ -99,7 +99,7 @@ namespace RoguelikeSurvivor
             grb.gravityScale = 0f;
             var gc = _xpGemPrefabGO.AddComponent<CircleCollider2D>();
             gc.radius = 0.25f; gc.isTrigger = true;
-            AddUnlitSR(_xpGemPrefabGO).sprite = LoadSprite("xp_gem") ?? DiamondSprite(16, Color.yellow);
+            var gsr = AddUnlitSR(_xpGemPrefabGO); gsr.sprite = LoadSprite("xp_gem") ?? DiamondSprite(16, Color.yellow); gsr.sortingOrder = 1;
             _xpGemPrefabGO.AddComponent<XPGem>();
             _xpGemPrefabGO.SetActive(false);
 
@@ -117,7 +117,7 @@ namespace RoguelikeSurvivor
             var rb = _playerGO.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f; rb.freezeRotation = true;
             _playerGO.AddComponent<CircleCollider2D>().radius = 0.45f;
-            AddUnlitSR(_playerGO).sprite = LoadSprite("player") ?? CircleSprite(56, new Color(0.5f, 0.8f, 1f));
+            var plsr = AddUnlitSR(_playerGO); plsr.sprite = LoadSprite("player") ?? CircleSprite(56, new Color(0.5f, 0.8f, 1f)); plsr.sortingOrder = 10;
 
             var stats = _playerGO.AddComponent<PlayerStats>();
             var ctrl = _playerGO.AddComponent<PlayerController>();
