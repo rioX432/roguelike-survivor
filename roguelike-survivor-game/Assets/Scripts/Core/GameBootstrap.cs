@@ -142,8 +142,18 @@ namespace RoguelikeSurvivor
             cam.backgroundColor = new Color(0.04f, 0.04f, 0.12f);
             cam.transform.position = new Vector3(0, 0, -10);
 
+            // URP 2D: ensure proper renderer assignment
+            var urpData = camGO.GetComponent<UniversalAdditionalCameraData>();
+            if (urpData == null) urpData = camGO.AddComponent<UniversalAdditionalCameraData>();
+            urpData.renderType = CameraRenderType.Base;
+            urpData.renderShadows = false;
+            urpData.requiresColorOption = CameraOverrideOption.Off;
+            urpData.requiresDepthOption = CameraOverrideOption.Off;
+
             var follow = camGO.GetComponent<CameraFollow>() ?? camGO.AddComponent<CameraFollow>();
             follow.InjectTarget(_playerGO.transform);
+
+            Debug.Log("[GameBootstrap] Camera created ✓");
         }
 
         // ─── Map ───────────────────────────────────────────────────────────
