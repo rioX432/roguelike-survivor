@@ -51,28 +51,6 @@ namespace RoguelikeSurvivor
             playerObj.AddComponent<PlayerXP>();
             playerObj.AddComponent<RadialAttack>();
 
-            var camFollow = camObj.AddComponent<CameraFollow>();
-            camFollow.GetType().GetField("_target", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(camFollow, playerObj.transform);
-
-            // Create UI Canvas
-            var canvasObj = new GameObject("Canvas_Dynamic");
-            var canvas = canvasObj.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObj.AddComponent<CanvasScaler>();
-            canvasObj.AddComponent<GraphicRaycaster>();
-
-            // Add UI components
-            var hpBarObj = new GameObject("HPBar", typeof(Image), typeof(HPBar));
-            hpBarObj.transform.SetParent(canvasObj.transform);
-            var hpBar = hpBarObj.GetComponent<HPBar>();
-            hpBar.GetType().GetField("_slider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.SetValue(hpBar, hpBarObj.AddComponent<Slider>());
-
-            var xpBarObj = new GameObject("XPBar", typeof(Image), typeof(XPBar));
-            xpBarObj.transform.SetParent(canvasObj.transform);
-
-            var timerObj = new GameObject("Timer", typeof(TextMeshProUGUI), typeof(TimerUI));
-            timerObj.transform.SetParent(canvasObj.transform);
-
             Debug.Log("[AutoSceneInitializer] Scene initialized with core GameObjects");
         }
     }
