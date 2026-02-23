@@ -3,109 +3,126 @@ using UnityEngine;
 
 namespace RoguelikeSurvivor
 {
+    /// <summary>
+    /// Reads SpawnTableData and spawns enemies around the player over 10 minutes.
+    /// Enemies spawn off-screen on a circle around the player.
+    /// </summary>
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField] private SpawnTableData _spawnTable;
-        [SerializeField] private Transform _playerTransform;
-        [SerializeField] private GameObject _enemyPrefab;
-        [SerializeField] private float _spawnRadius = 12f;
+        [SerializeField] private Transform _player;
+        [SerializeField] private float _spawnRadius = 12f;     // distance from player
+        [SerializeField] private float _despawnRadius = 20f;   // despawn if too far
 
-        // Per-wave active count tracking (index matches _spawnTable.waves)
-        private readonly List<int> _activeCountPerWave = new();
-        private readonly List<float> _spawnTimers = new();
+        // Prefabs keyed by EnemyData asset name — wire up in Inspector
+        [SerializeField] private List<EnemyPrefabEntry> _enemyPrefabs = new();
 
+        // Track active counts per enemy type
+        private readonly Dictionary<string, int> _activeCounts = new();
+        // Track timers per wave
+        private float[] _waveTimers;
+
+        private float _gameTime;
         private bool _isRunning;
 
         private void Start()
         {
-            if (_spawnTable == null) return;
-
-            for (int i = 0; i < _spawnTable.waves.Count; i++)
-            {
-                _activeCountPerWave.Add(0);
-                _spawnTimers.Add(0f);
-            }
-
-            // Listen for enemy death to update active counts
-            EventBus.OnEnemyDeath += OnEnemyDeath;
+            if (_spawnTable == null || _spawnTable.waves == null) return;
+            _waveTimers = new float[_spawnTable.waves.Count];
             _isRunning = true;
-        }
-
-        private void OnDestroy()
-        {
-            EventBus.OnEnemyDeath -= OnEnemyDeath;
         }
 
         private void Update()
         {
-            if (!_isRunning || _spawnTable == null || GameManager.Instance == null) return;
-            if (GameManager.Instance.CurrentState != GameState.Playing) return;
+            if (!_isRunning || _spawnTable == null) return;
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing) return;
 
-            float elapsed = GameManager.Instance.ElapsedTime;
+            _gameTime = GameManager.Instance != null ? GameManager.Instance.ElapsedTime : 0f;
 
             for (int i = 0; i < _spawnTable.waves.Count; i++)
             {
-                WaveEntry wave = _spawnTable.waves[i];
-
-                // Skip waves outside their time window
-                if (elapsed < wave.timeStart || elapsed > wave.timeEnd) continue;
-
-                // Skip waves with no enemy data assigned
-                if (wave.enemyData == null) continue;
-
-                // Skip if at cap
-                if (_activeCountPerWave[i] >= wave.maxActive) continue;
-
-                // Accumulate spawn timer
-                _spawnTimers[i] += Time.deltaTime;
-                float interval = wave.spawnRate > 0f ? 1f / wave.spawnRate : float.MaxValue;
-
-                if (_spawnTimers[i] >= interval)
-                {
-                    _spawnTimers[i] -= interval;
-                    SpawnEnemy(wave.enemyData, i);
-                }
+                ProcessWave(i);
             }
         }
 
-        private void SpawnEnemy(EnemyData data, int waveIndex)
+        private void ProcessWave(int index)
         {
-            if (_enemyPrefab == null || PoolManager.Instance == null || _playerTransform == null) return;
+            WaveEntry wave = _spawnTable.waves[index];
+            if (wave.enemyData == null) return;
+            if (_gameTime < wave.timeStart || _gameTime > wave.timeEnd) return;
 
-            Vector2 spawnPos = GetSpawnPositionAroundPlayer();
+            string key = wave.enemyData.enemyName;
 
-            GameObject obj = PoolManager.Instance.Spawn(
-                _enemyPrefab,
-                spawnPos,
-                Quaternion.identity);
+            // Check active cap
+            if (!_activeCounts.ContainsKey(key)) _activeCounts[key] = 0;
+            if (_activeCounts[key] >= wave.maxActive) return;
 
-            if (obj.TryGetComponent<EnemyBase>(out var enemy))
-                enemy.Initialize(data, _playerTransform);
+            // Tick spawn timer
+            _waveTimers[index] += Time.deltaTime;
+            float spawnInterval = wave.spawnRate > 0f ? 1f / wave.spawnRate : float.MaxValue;
 
-            _activeCountPerWave[waveIndex]++;
-        }
-
-        private Vector2 GetSpawnPositionAroundPlayer()
-        {
-            // Random point on circle edge around player (off-screen)
-            float angle = Random.Range(0f, Mathf.PI * 2f);
-            return (Vector2)_playerTransform.position
-                + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * _spawnRadius;
-        }
-
-        private void OnEnemyDeath(GameObject _)
-        {
-            // Decrement all wave active counts by checking GameObject tags
-            // Simple approach: just decrement the first wave that still has actives
-            // More accurate tracking would require tagging enemies with wave index.
-            for (int i = 0; i < _activeCountPerWave.Count; i++)
+            if (_waveTimers[index] >= spawnInterval)
             {
-                if (_activeCountPerWave[i] > 0)
+                _waveTimers[index] = 0f;
+                SpawnEnemy(wave.enemyData, key);
+            }
+        }
+
+        private void SpawnEnemy(EnemyData data, string key)
+        {
+            if (_player == null || PoolManager.Instance == null) return;
+
+            GameObject prefab = GetPrefabForEnemy(data.enemyName);
+            if (prefab == null) return;
+
+            Vector2 spawnPos = _player.position + (Vector3)(Random.insideUnitCircle.normalized * _spawnRadius);
+            GameObject enemy = PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.identity);
+
+            if (enemy.TryGetComponent<EnemyBase>(out _))
+            {
+                if (!_activeCounts.ContainsKey(key)) _activeCounts[key] = 0;
+                _activeCounts[key]++;
+            }
+        }
+
+        /// <summary>Called by EnemyBase.Die() via EventBus to decrement active count.</summary>
+        private void OnEnable()
+        {
+            EventBus.OnEnemyDeath += HandleEnemyDeath;
+        }
+
+        private void OnDisable()
+        {
+            EventBus.OnEnemyDeath -= HandleEnemyDeath;
+        }
+
+        private void HandleEnemyDeath(GameObject enemy)
+        {
+            if (enemy.TryGetComponent<EnemyBase>(out var eb))
+            {
+                string key = eb.Data != null ? eb.Data.enemyName : string.Empty;
+                if (!string.IsNullOrEmpty(key) && _activeCounts.ContainsKey(key))
                 {
-                    _activeCountPerWave[i]--;
-                    break;
+                    _activeCounts[key] = Mathf.Max(0, _activeCounts[key] - 1);
                 }
             }
+        }
+
+        private GameObject GetPrefabForEnemy(string enemyName)
+        {
+            foreach (var entry in _enemyPrefabs)
+            {
+                if (entry.enemyName == enemyName)
+                    return entry.prefab;
+            }
+            return null;
+        }
+
+        [System.Serializable]
+        public class EnemyPrefabEntry
+        {
+            public string enemyName;
+            public GameObject prefab;
         }
     }
 }
