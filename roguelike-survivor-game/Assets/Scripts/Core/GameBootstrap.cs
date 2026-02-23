@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using TMPro;
 
@@ -49,6 +50,13 @@ namespace RoguelikeSurvivor
         // ─── Managers ──────────────────────────────────────────────────────
         private void CreateManagers()
         {
+            // URP 2D: Global Light required for all sprites to be visible
+            var lightGO = new GameObject("GlobalLight2D");
+            var light = lightGO.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Global;
+            light.intensity = 1f;
+            light.color = Color.white;
+
             new GameObject("GameManager").AddComponent<GameManager>();
             new GameObject("PoolManager").AddComponent<PoolManager>();
 
