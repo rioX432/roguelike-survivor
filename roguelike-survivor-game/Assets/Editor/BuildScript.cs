@@ -15,6 +15,14 @@ public static class BuildScript
             .ToArray();
     }
 
+    /// <summary>Inject bootstrap + build Android. Use this from -executeMethod.</summary>
+    [MenuItem("Build/Android APK (With Bootstrap)")]
+    public static void BuildAndroidWithBootstrap()
+    {
+        SceneBootstrapInjector.InjectBootstrapMenuItem();
+        BuildAndroid();
+    }
+
     [MenuItem("Build/Android APK")]
     public static void BuildAndroid()
     {
