@@ -10,53 +10,47 @@ namespace RoguelikeSurvivor
         [SerializeField] private VirtualJoystick _virtualJoystick;
 
         private Rigidbody2D _rb;
-        private InputSystem_Actions _inputActions;
         private Vector2 _moveInput;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
-            _inputActions = new InputSystem_Actions();
-        }
-
-        private void OnEnable()
-        {
-            _inputActions.Enable();
-        }
-
-        private void OnDisable()
-        {
-            _inputActions.Disable();
         }
 
         private void Update()
         {
-            // Read keyboard/gamepad input from InputSystem
-            Vector2 keyboardInput = _inputActions.Player.Move.ReadValue<Vector2>();
-
-            // Prefer virtual joystick on mobile; fall back to keyboard
+            // Virtual joystick (mobile)
             if (_virtualJoystick != null && _virtualJoystick.Direction.sqrMagnitude > 0.01f)
             {
                 _moveInput = _virtualJoystick.Direction;
+                return;
             }
-            else
+
+            // Keyboard fallback (PC / editor)
+            float x = 0f;
+            float y = 0f;
+
+            if (Keyboard.current != null)
             {
-                _moveInput = keyboardInput;
+                if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) x += 1f;
+                if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)  x -= 1f;
+                if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)    y += 1f;
+                if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)  y -= 1f;
             }
+
+            _moveInput = new Vector2(x, y);
 
             // Normalize to prevent diagonal speed boost
             if (_moveInput.sqrMagnitude > 1f)
-            {
                 _moveInput.Normalize();
-            }
         }
 
         private void FixedUpdate()
         {
             if (_stats == null) return;
-
-            Vector2 newPosition = _rb.position + _moveInput * (_stats.MoveSpeed * Time.fixedDeltaTime);
-            _rb.MovePosition(newPosition);
+            _rb.MovePosition(_rb.position + _moveInput * (_stats.MoveSpeed * Time.fixedDeltaTime));
         }
+
+        public Vector2 GetMoveDirection() => _moveInput;
     }
 }
