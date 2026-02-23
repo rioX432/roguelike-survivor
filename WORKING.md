@@ -3,70 +3,94 @@
 All agents MUST read this file at the start of each session.
 Update your section when you start/complete a task.
 
-## Current Sprint: Phase 1 — Foundation (0:00 - 1:30)
+## Current Sprint: Phase 1 — Foundation
 
 ### architect
-- Status: active
-- Current task: Phase 1 orchestration — spawning builder-alpha and builder-beta
-- Blocked by: -
+- Status: monitoring
+- Current task: Phase 1 review — awaiting PR merges, then Phase 2 setup
+- Blocked by: Claude Code outdated (v1.0.68 → needs v1.0.88+), skipped via direct script writing
 
 ### builder-alpha
-- Status: active
-- Current task: feat/player-movement (PlayerController + virtual joystick), then feat/camera-follow
-- Blocked by: -
+- Status: PR ready (awaiting review/merge)
+- Current task: -
+- Completed: feat/player-movement → PR #1
 
 ### builder-beta
-- Status: active
-- Current task: feat/scriptableobject-schemas (verify SO classes, create EditorScript to generate assets)
-- Blocked by: -
+- Status: PR ready (awaiting review/merge)
+- Current task: -
+- Completed: feat/scriptableobject-schemas → PR #2
 
 ### reviewer
 - Status: idle
-- Current task: -
+- Current task: Review PR #1 and PR #2
 - Blocked by: -
 
 ## Task Queue (Priority Order)
 
 ### In Progress
-- [ ] [builder-alpha] feat/player-movement — PlayerController.cs, virtual joystick, Rigidbody2D movement
-- [ ] [builder-alpha] feat/camera-follow — CameraFollow.cs, portrait mode 9:16
-- [ ] [builder-beta] feat/scriptableobject-schemas — Verify SO classes, EditorScript to create EnemyData/WeaponData assets
+- [ ] [human/architect] Review & merge PR #1 (player-movement + camera)
+- [ ] [human/architect] Review & merge PR #2 (SO schemas editor script)
+- [ ] [human] Run "GlitchClaw/Generate All Game Data" in Unity Editor after merging PR #2
+- [ ] [human] Assign sprites to EnemyData/WeaponData in Inspector
+- [ ] [human] Assign EnemyData refs to SpawnTable wave entries in Inspector
+- [ ] [architect] feat/generated-assets — ComfyUI pixel art generation (player + 5 enemies + bg tile)
 
-### Pending (Phase 1 remaining)
-- [ ] [architect] feat/generated-assets — ComfyUI pixel art generation (player, 5 enemies, bg tile)
+### Pending (Phase 2)
+- [ ] [builder-alpha] feat/infinite-map — 3x3 chunk ring buffer
+- [ ] [builder-beta] feat/object-pool — PoolManager pre-warm, IPoolable
+- [ ] [builder-beta] feat/enemy-base — EnemyBase + chase AI + contact damage
+- [ ] [builder-beta] feat/enemy-spawner — reads SpawnTableData, off-screen spawn circle
 
-### Pending (Phase 2+)
-- [ ] [builder-alpha] feat/infinite-map
-- [ ] [builder-beta] feat/object-pool
-- [ ] [builder-beta] feat/enemy-base
-- [ ] [builder-beta] feat/enemy-spawner
-- [ ] [builder-alpha] feat/attack-system
-- [ ] [builder-alpha] feat/attack-variants
-- [ ] [builder-beta] feat/enemy-damage
-- [ ] [builder-alpha] feat/levelup-system
-- [ ] [builder-alpha] feat/levelup-ui
-- [ ] [builder-alpha] feat/hud
-- [ ] [builder-alpha] feat/result-screen
-- [ ] [builder-beta] feat/wave-data
-- [ ] [architect] feat/bgm
-- [ ] [architect] feat/sound-effects
-- [ ] [reviewer] feat/perf-tuning
-- [ ] [builder-alpha] feat/final-build
+### Pending (Phase 3+)
+- [ ] [builder-alpha] feat/attack-system — AttackModule base + RadialAttack
+- [ ] [builder-alpha] feat/attack-variants — ConeAttack + HomingAttack
+- [ ] [builder-beta] feat/enemy-damage — HP + TakeDamage + XP drop
+- [ ] [builder-alpha] feat/levelup-system — XP magnet + level up + TimeScale=0 pause
+- [ ] [builder-alpha] feat/levelup-ui — 3-card upgrade panel
+- [ ] [builder-alpha] feat/hud — HP/XP bars + timer
+- [ ] [builder-alpha] feat/result-screen — stats display + retry button
+- [ ] [builder-beta] feat/wave-data — SpawnTableData 10-min progression
+- [ ] [architect] feat/bgm — Suno BGM generation
+- [ ] [architect] feat/sound-effects — SE integration
+- [ ] [reviewer] feat/perf-tuning — profiler 60FPS check
+- [ ] [builder-alpha] feat/final-build — Android APK + iOS Xcode
 
 ### Completed
-- [x] Core scripts: GameManager, PoolManager, EventBus, IPoolable
-- [x] Data class definitions: EnemyData.cs, WeaponData.cs, SpawnTableData.cs
+- [x] Core scripts: GameManager, PoolManager, EventBus, IPoolable (pre-existing)
+- [x] Data class definitions: EnemyData.cs, WeaponData.cs, SpawnTableData.cs (pre-existing)
+- [x] feat/player-movement: PlayerController, PlayerStats, VirtualJoystick, CameraFollow → PR #1
+- [x] feat/scriptableobject-schemas: GameDataGenerator EditorScript → PR #2
+
+## Pull Requests
+
+| PR | Branch | Title | Status |
+|---|---|---|---|
+| #1 | feat/player-movement | Add PlayerController, PlayerStats, VirtualJoystick, CameraFollow | Open |
+| #2 | feat/scriptableobject-schemas | Add GameDataGenerator EditorScript | Open |
 
 ## Decisions Log
 
-- [2026-02-22] Unity project located at `roguelike-survivor-game/` (URP 2D template, basic structure ready)
-- [2026-02-22] Core scripts (GameManager, PoolManager, EventBus) already implemented — skip re-implementation
-- [2026-02-22] Data class C# files already exist — builder-beta focuses on EditorScript to generate .asset files
-- [2026-02-22] Phase 1 started: builder-alpha (player+camera), builder-beta (SO assets) running in parallel
-- [2026-02-22] mcporter not in PATH — Unity MCP availability to be confirmed before SO asset generation
-- [DECISION NEEDED] Virtual joystick: use Joystick Pack asset or custom implementation?
+- [2026-02-22] Unity project at `roguelike-survivor-game/` (URP 2D template, basic structure ready)
+- [2026-02-22] Core scripts (GameManager, PoolManager, EventBus) already implemented
+- [2026-02-22] Data class C# files already exist; builder-beta focuses on EditorScript
+- [2026-02-22] Claude Code v1.0.68 outdated, needs sudo to update; architect wrote scripts directly
+- [2026-02-22] CameraFollow included in feat/player-movement PR (same logical unit)
+- [2026-02-22] SpawnTable wave EnemyData refs must be assigned manually in Unity Inspector
+- [DECISION NEEDED] Virtual joystick: using custom VirtualJoystick.cs (not Joystick Pack asset)
+- [DECISION NEEDED] ComfyUI MCP: mcporter not in PATH — needs investigation
 
 ## Blockers / Issues
 
-- mcporter CLI not found in PATH — need to verify Unity MCP server for scene/prefab ops
-- ComfyUI asset generation blocked until mcporter/MCP servers confirmed available
+- **Claude Code v1.0.68**: Needs update to v1.0.88+. Requires sudo permissions: `sudo chown -R $USER:$(id -gn) $(npm -g config get prefix)` then `claude update`
+- **mcporter CLI**: Not found in PATH. Verify Unity MCP and ComfyUI MCP servers before Phase 2 scene setup
+- **SpawnTable refs**: EnemyData references in SpawnTableData must be linked manually in Unity Inspector after running GameDataGenerator
+- **Sprites**: No pixel art assets yet — ComfyUI generation blocked on mcporter
+
+## Notes for Next Session (Phase 2)
+
+Before starting Phase 2:
+1. Merge PRs #1 and #2
+2. Run "GlitchClaw/Generate All Game Data" in Unity
+3. Check if mcporter is available: try `~/.npm/bin/mcporter` or `npx mcporter`
+4. Start ComfyUI for asset generation
+5. Phase 2 assigns: builder-alpha (feat/infinite-map), builder-beta (feat/object-pool + feat/enemy-base)
