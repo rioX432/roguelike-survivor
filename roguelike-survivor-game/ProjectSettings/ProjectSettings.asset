@@ -166,6 +166,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
+    Android: com.glitchclaw.survivor
     Standalone: com.DefaultCompany.2D-URP
   buildNumber:
     Standalone: 0
@@ -875,7 +876,7 @@ PlayerSettings:
   qnxGraphicConfPath: 
   apiCompatibilityLevel: 6
   captureStartupLogs: {}
-  activeInputHandler: 1
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: 6486a5ef-1cfc-48b8-9a3b-78ccfbb0ec53
   framebufferDepthMemorylessMode: 0
