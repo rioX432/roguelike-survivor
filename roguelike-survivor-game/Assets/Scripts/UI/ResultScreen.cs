@@ -13,41 +13,30 @@ namespace RoguelikeSurvivor
         [SerializeField] private TMP_Text _levelReachedText;
         [SerializeField] private Button _retryButton;
 
-        private int _enemyKillCount;
         private float _survivalTime;
 
         private void Start()
         {
             _panelRoot.SetActive(false);
-
-            EventBus.OnGameOver += OnGameOver;
-            EventBus.OnPlayerDeath += OnGameOver;
-            EventBus.OnEnemyDeath += OnEnemyDeath;
-
             _retryButton?.onClick.AddListener(OnRetry);
         }
 
-        private void OnDestroy()
+        private void OnEnable()
         {
-            EventBus.OnGameOver -= OnGameOver;
-            EventBus.OnPlayerDeath -= OnGameOver;
-            EventBus.OnEnemyDeath -= OnEnemyDeath;
+            EventBus.OnGameOver += ShowResult;
+            EventBus.OnPlayerDeath += ShowResult;
+        }
+
+        private void OnDisable()
+        {
+            EventBus.OnGameOver -= ShowResult;
+            EventBus.OnPlayerDeath -= ShowResult;
         }
 
         private void Update()
         {
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Playing)
                 _survivalTime = GameManager.Instance.ElapsedTime;
-        }
-
-        private void OnEnemyDeath(GameObject _)
-        {
-            _enemyKillCount++;
-        }
-
-        private void OnGameOver()
-        {
-            ShowResult();
         }
 
         private void ShowResult()
@@ -59,13 +48,13 @@ namespace RoguelikeSurvivor
             if (_survivalTimeText != null)
                 _survivalTimeText.text = $"Survived: {minutes:00}:{seconds:00}";
 
+            int kills = LevelUpSystem.Instance != null ? LevelUpSystem.Instance.GetEnemiesKilled() : 0;
             if (_enemiesKilledText != null)
-                _enemiesKilledText.text = $"Enemies: {_enemyKillCount}";
+                _enemiesKilledText.text = $"Enemies: {kills}";
 
-            // Get level from PlayerXP
-            var playerXP = FindFirstObjectByType<PlayerXP>();
+            int level = LevelUpSystem.Instance != null ? LevelUpSystem.Instance.Level : 1;
             if (_levelReachedText != null)
-                _levelReachedText.text = $"Level: {(playerXP != null ? playerXP.Level : 1)}";
+                _levelReachedText.text = $"Level: {level}";
         }
 
         private void OnRetry()
