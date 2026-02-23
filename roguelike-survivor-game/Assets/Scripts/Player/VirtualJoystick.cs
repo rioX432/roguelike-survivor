@@ -25,8 +25,14 @@ namespace RoguelikeSurvivor
             _fullRange = range;
         }
 
+        private bool IsPlaying =>
+            GameManager.Instance != null &&
+            GameManager.Instance.CurrentState == GameState.Playing;
+
         public void OnPointerDown(PointerEventData eventData)
         {
+            // ゲームプレイ中のみ受け付ける（GameOver/LevelUpではボタン優先）
+            if (!IsPlaying) return;
             _touchOrigin = eventData.position;
             _isTouching = true;
             Direction = Vector2.zero;
@@ -34,7 +40,7 @@ namespace RoguelikeSurvivor
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!_isTouching) return;
+            if (!_isTouching || !IsPlaying) return;
 
             Vector2 delta = eventData.position - _touchOrigin;
             float magnitude = delta.magnitude;
@@ -45,7 +51,6 @@ namespace RoguelikeSurvivor
                 return;
             }
 
-            // Normalize direction; scale magnitude to 0–1 over fullRange
             float strength = Mathf.Clamp01((magnitude - _deadZone) / (_fullRange - _deadZone));
             Direction = delta.normalized * strength;
         }

@@ -373,10 +373,12 @@ namespace RoguelikeSurvivor
 
         private void CreateLevelUpPanel(RectTransform parent)
         {
-            // Panel (visual, starts hidden)
+            // Panel - 独立 Canvas（sortingOrder 高め）でスワイプ overlay より必ず前面に
             var panelGO = new GameObject("LevelUpPanel");
             panelGO.transform.SetParent(parent, false);
             panelGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.88f);
+            var lc = panelGO.AddComponent<Canvas>(); lc.overrideSorting = true; lc.sortingOrder = 50;
+            panelGO.AddComponent<GraphicRaycaster>();
             var panelRect = panelGO.GetComponent<RectTransform>();
             panelRect.anchorMin = Vector2.zero; panelRect.anchorMax = Vector2.one;
             panelRect.offsetMin = Vector2.zero; panelRect.offsetMax = Vector2.zero;
@@ -418,10 +420,12 @@ namespace RoguelikeSurvivor
 
         private void CreateResultScreen(RectTransform parent)
         {
-            // Panel (visual, starts hidden)
+            // Panel - 独立 Canvas（sortingOrder 高め）でスワイプ overlay より必ず前面に
             var panelGO = new GameObject("ResultPanel");
             panelGO.transform.SetParent(parent, false);
             panelGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.9f);
+            var oc = panelGO.AddComponent<Canvas>(); oc.overrideSorting = true; oc.sortingOrder = 50;
+            panelGO.AddComponent<GraphicRaycaster>();
             var panelRect = panelGO.GetComponent<RectTransform>();
             panelRect.anchorMin = Vector2.zero; panelRect.anchorMax = Vector2.one;
             panelRect.offsetMin = Vector2.zero; panelRect.offsetMax = Vector2.zero;
