@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using TMPro;
@@ -190,7 +191,8 @@ namespace RoguelikeSurvivor
             {
                 var esGO = new GameObject("EventSystem");
                 esGO.AddComponent<EventSystem>();
-                esGO.AddComponent<StandaloneInputModule>();
+                // New Input System requires InputSystemUIInputModule for touch/UI events
+                esGO.AddComponent<InputSystemUIInputModule>();
             }
 
             var canvasGO = new GameObject("Canvas_HUD");
