@@ -367,25 +367,25 @@ namespace RoguelikeSurvivor
 
         private VirtualJoystick CreateJoystick(RectTransform parent)
         {
-            var bgGO = new GameObject("JoystickBG");
-            bgGO.transform.SetParent(parent, false);
-            bgGO.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.12f);
-            var bgRect = bgGO.GetComponent<RectTransform>();
-            bgRect.anchorMin = bgRect.anchorMax = new Vector2(0.25f, 0.18f);
-            bgRect.anchoredPosition = Vector2.zero;
-            bgRect.sizeDelta = new Vector2(220, 220);
+            // Full-screen transparent overlay — swipe anywhere to move
+            var overlayGO = new GameObject("SwipeOverlay");
+            overlayGO.transform.SetParent(parent, false);
 
-            var handleGO = new GameObject("JoystickHandle");
-            handleGO.transform.SetParent(bgGO.transform, false);
-            handleGO.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.45f);
-            var handleRect = handleGO.GetComponent<RectTransform>();
-            handleRect.anchorMin = handleRect.anchorMax = new Vector2(0.5f, 0.5f);
-            handleRect.anchoredPosition = Vector2.zero;
-            handleRect.sizeDelta = new Vector2(90, 90);
+            // Transparent image covering full screen (raycast target required for events)
+            var img = overlayGO.AddComponent<Image>();
+            img.color = new Color(0f, 0f, 0f, 0f); // fully transparent
 
-            // AddComponent triggers Awake — _background is null but we null-checked it
-            var joystick = bgGO.AddComponent<VirtualJoystick>();
-            joystick.InjectRects(bgRect, handleRect, 80f);
+            var rect = overlayGO.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            // Place BEHIND other UI (HUD stays on top)
+            overlayGO.transform.SetAsFirstSibling();
+
+            var joystick = overlayGO.AddComponent<VirtualJoystick>();
+            joystick.InjectRects(null, null, 120f);
             return joystick;
         }
 

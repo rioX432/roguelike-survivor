@@ -3,64 +3,57 @@ using UnityEngine.EventSystems;
 
 namespace RoguelikeSurvivor
 {
+    /// <summary>
+    /// Full-screen swipe input: touch anywhere, drag to move.
+    /// The direction is calculated from the initial touch point.
+    /// No visible joystick UI.
+    /// </summary>
     public class VirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
     {
-        [SerializeField] private RectTransform _background;
-        [SerializeField] private RectTransform _handle;
-        [SerializeField] private float _range = 75f;
-
+        /// <summary>Normalized movement direction (magnitude 0–1).</summary>
         public Vector2 Direction { get; private set; }
 
-        private Vector2 _startPosition;
-        private Canvas _canvas;
+        [SerializeField] private float _deadZone = 8f;      // pixels before movement starts
+        [SerializeField] private float _fullRange = 120f;   // pixels for full-speed input
 
+        private Vector2 _touchOrigin;
+        private bool _isTouching;
+
+        // InjectRects kept for API compatibility — no-op in swipe mode
         public void InjectRects(RectTransform background, RectTransform handle, float range)
         {
-            _background = background;
-            _handle = handle;
-            _range = range;
-            _startPosition = background.anchoredPosition;
-        }
-
-        private void Awake()
-        {
-            _canvas = GetComponentInParent<Canvas>();
-            if (_background != null) _startPosition = _background.anchoredPosition;
+            _fullRange = range;
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            // Fixed joystick: don't move the background to avoid bottom-edge issues
-            // Reset handle to center on new touch
-            _handle.anchoredPosition = Vector2.zero;
-            OnDrag(eventData);
+            _touchOrigin = eventData.position;
+            _isTouching = true;
+            Direction = Vector2.zero;
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _background,
-                eventData.position,
-                eventData.pressEventCamera,
-                out Vector2 localPoint)) return;
+            if (!_isTouching) return;
 
-            Vector2 offset = localPoint;
-            float magnitude = offset.magnitude;
+            Vector2 delta = eventData.position - _touchOrigin;
+            float magnitude = delta.magnitude;
 
-            if (magnitude > _range)
+            if (magnitude < _deadZone)
             {
-                offset = offset.normalized * _range;
+                Direction = Vector2.zero;
+                return;
             }
 
-            _handle.anchoredPosition = offset;
-            Direction = offset / _range;
+            // Normalize direction; scale magnitude to 0–1 over fullRange
+            float strength = Mathf.Clamp01((magnitude - _deadZone) / (_fullRange - _deadZone));
+            Direction = delta.normalized * strength;
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
             Direction = Vector2.zero;
-            _handle.anchoredPosition = Vector2.zero;
-            _background.anchoredPosition = _startPosition;
+            _isTouching = false;
         }
     }
 }
