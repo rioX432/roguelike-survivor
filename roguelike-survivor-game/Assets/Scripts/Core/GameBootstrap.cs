@@ -1,12 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using TMPro;
 
 namespace RoguelikeSurvivor
 {
@@ -52,31 +50,6 @@ namespace RoguelikeSurvivor
         // ─── Managers ──────────────────────────────────────────────────────
         private void CreateManagers()
         {
-            // Force-init TMP_Settings with a built-in font so text renders without imported assets
-            try
-            {
-                if (Resources.Load<TMP_Settings>("TMP Settings") == null)
-                {
-                    var s = ScriptableObject.CreateInstance<TMP_Settings>();
-                    // Create font asset from built-in Arial
-                    var arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                    if (arial != null)
-                    {
-                        var fontAsset = TMP_FontAsset.CreateFontAsset(arial);
-                        typeof(TMP_Settings)
-                            .GetField("m_defaultFontAsset", BindingFlags.Instance | BindingFlags.NonPublic)
-                            ?.SetValue(s, fontAsset);
-                        typeof(TMP_Settings)
-                            .GetField("m_defaultFontAssetSize", BindingFlags.Instance | BindingFlags.NonPublic)
-                            ?.SetValue(s, 36);
-                    }
-                    typeof(TMP_Settings)
-                        .GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic)
-                        ?.SetValue(null, s);
-                }
-            }
-            catch { /* TMP unavailable — text labels will be absent */ }
-
             // URP 2D: Global Light required for all sprites to be visible
             var lightGO = new GameObject("GlobalLight2D");
             var light = lightGO.AddComponent<Light2D>();
@@ -244,13 +217,13 @@ namespace RoguelikeSurvivor
             // ── Level label (bottom-left) ──
             var levelTxt = MakeLabel("LevelLabel", root,
                 new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(90f, 70f), new Vector2(180f, 50f),
-                "Lv.1", 40, TextAlignmentOptions.Left);
+                "Lv.1", 40, TextAnchor.MiddleLeft);
             xpBar.InjectLevelText(levelTxt);
 
             // ── Timer (top-right) ──
             var timerTxt = MakeLabel("TimerLabel", root,
                 new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-110f, -50f), new Vector2(220f, 60f),
-                "10:00", 48, TextAlignmentOptions.Right);
+                "10:00", 48, TextAnchor.MiddleRight);
             var timerUI = new GameObject("TimerUICtrl").AddComponent<TimerUI>();
             timerUI.transform.SetParent(canvasGO.transform, false);
             timerUI.InjectText(timerTxt);
@@ -296,9 +269,9 @@ namespace RoguelikeSurvivor
         {
             yield return null;
             if (PoolManager.Instance == null) yield break;
-            PoolManager.Instance.PreWarm(_enemyPrefabGO, 40);
+            PoolManager.Instance.PreWarm(_enemyPrefabGO, 100);  // max simultaneous ~82
             PoolManager.Instance.PreWarm(_projectilePrefabGO, 80);
-            PoolManager.Instance.PreWarm(_xpGemPrefabGO, 40);
+            PoolManager.Instance.PreWarm(_xpGemPrefabGO, 60);
             Debug.Log("[GameBootstrap] Pool warmed.");
         }
 
@@ -347,22 +320,30 @@ namespace RoguelikeSurvivor
             return go;
         }
 
-        private TMP_Text MakeLabel(string name, RectTransform parent,
+        private static Font _uiFont;
+        private static Font UIFont =>
+            _uiFont != null ? _uiFont : (_uiFont = Resources.GetBuiltinResource<Font>("Arial.ttf"));
+
+        private Text MakeLabel(string name, RectTransform parent,
             Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPos, Vector2 sizeDelta,
-            string text, float fontSize, TextAlignmentOptions align)
+            string labelText, float fontSize, TextAnchor align = TextAnchor.MiddleCenter)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text = text;
-            tmp.fontSize = fontSize;
-            tmp.color = Color.white;
-            tmp.alignment = align;
+            var t = go.AddComponent<Text>();
+            t.text = labelText;
+            t.font = UIFont;
+            t.fontSize = Mathf.RoundToInt(fontSize * 0.55f); // TMP size → UI.Text size
+            t.color = Color.white;
+            t.alignment = align;
+            t.resizeTextForBestFit = true;
+            t.resizeTextMinSize = 8;
+            t.resizeTextMaxSize = Mathf.RoundToInt(fontSize * 0.6f);
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = anchorMin; rect.anchorMax = anchorMax;
             rect.anchoredPosition = anchoredPos;
             rect.sizeDelta = sizeDelta;
-            return tmp;
+            return t;
         }
 
         private VirtualJoystick CreateJoystick(RectTransform parent)
@@ -402,10 +383,10 @@ namespace RoguelikeSurvivor
 
             MakeLabel("LUTitle", panelRect,
                 new Vector2(0f, 0.72f), new Vector2(1f, 0.92f), Vector2.zero, Vector2.zero,
-                "LEVEL UP!\n<size=50>Choose an upgrade</size>", 68, TextAlignmentOptions.Center);
+                "LEVEL UP!\nChoose an upgrade", 68, TextAnchor.MiddleCenter);
 
             var cardBtns = new List<Button>();
-            var cardTexts = new List<TMP_Text>();
+            var cardTexts = new List<Text>();
             string[] cardNames = { "Radial Burst", "Cone Shot", "Homing Strike" };
             string[] cardDescs = { "360° auto attack", "Forward spread shot", "Seeks nearest enemy" };
 
@@ -422,7 +403,7 @@ namespace RoguelikeSurvivor
                 cardRect.offsetMin = Vector2.zero; cardRect.offsetMax = Vector2.zero;
                 cardTexts.Add(MakeLabel($"CardText_{i}", cardRect,
                     Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
-                    $"<b>{cardNames[i]}</b>\n{cardDescs[i]}", 40, TextAlignmentOptions.Center));
+                    $"{cardNames[i]}\n{cardDescs[i]}", 40, TextAnchor.MiddleCenter));
                 var btn = cardGO.AddComponent<Button>(); btn.targetGraphic = cardImg;
                 cardBtns.Add(btn);
             }
@@ -447,16 +428,16 @@ namespace RoguelikeSurvivor
 
             MakeLabel("ResultTitle", panelRect,
                 new Vector2(0.05f, 0.75f), new Vector2(0.95f, 0.92f), Vector2.zero, Vector2.zero,
-                "GAME OVER", 90, TextAlignmentOptions.Center);
+                "GAME OVER", 90, TextAnchor.MiddleCenter);
             var timeTxt = MakeLabel("TimeText", panelRect,
                 new Vector2(0.1f, 0.60f), new Vector2(0.9f, 0.72f), Vector2.zero, Vector2.zero,
-                "Survived: 00:00", 52, TextAlignmentOptions.Center);
+                "Survived: 00:00", 52, TextAnchor.MiddleCenter);
             var killsTxt = MakeLabel("KillsText", panelRect,
                 new Vector2(0.1f, 0.48f), new Vector2(0.9f, 0.60f), Vector2.zero, Vector2.zero,
-                "Enemies: 0", 52, TextAlignmentOptions.Center);
+                "Enemies: 0", 52, TextAnchor.MiddleCenter);
             var levelTxt = MakeLabel("LevelText", panelRect,
                 new Vector2(0.1f, 0.36f), new Vector2(0.9f, 0.48f), Vector2.zero, Vector2.zero,
-                "Level: 1", 52, TextAlignmentOptions.Center);
+                "Level: 1", 52, TextAnchor.MiddleCenter);
 
             var btnGO = new GameObject("RetryBtn");
             btnGO.transform.SetParent(panelGO.transform, false);
@@ -465,7 +446,7 @@ namespace RoguelikeSurvivor
             btnRect.anchorMin = new Vector2(0.2f, 0.16f); btnRect.anchorMax = new Vector2(0.8f, 0.30f);
             btnRect.offsetMin = Vector2.zero; btnRect.offsetMax = Vector2.zero;
             MakeLabel("RetryLabel", btnRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
-                "RETRY", 64, TextAlignmentOptions.Center);
+                "RETRY", 64, TextAnchor.MiddleCenter);
             var retryBtn = btnGO.AddComponent<Button>(); retryBtn.targetGraphic = btnImg;
 
             // Controller on ALWAYS-ACTIVE GO

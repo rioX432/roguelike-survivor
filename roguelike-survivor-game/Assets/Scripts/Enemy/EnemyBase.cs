@@ -119,8 +119,8 @@ namespace RoguelikeSurvivor
         private IEnumerator HitFlash()
         {
             _spriteRenderer.color = new Color(1f, 0.25f, 0.25f);
-            yield return new WaitForSeconds(0.08f);
-            if (!_isDead && _spriteRenderer != null)
+            yield return new WaitForSecondsRealtime(0.08f); // unaffected by timeScale=0
+            if (_spriteRenderer != null)
                 _spriteRenderer.color = Color.white;
         }
 

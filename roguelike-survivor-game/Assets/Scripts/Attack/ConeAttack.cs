@@ -49,15 +49,15 @@ namespace RoguelikeSurvivor
         private GameObject FindNearestEnemy()
         {
             // Use FindGameObjectsWithTag — cached is preferred but OK for non-hot-path (fired at intervals)
-            GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            if (enemies.Length == 0) return null;
+            var enemyBases = UnityEngine.Object.FindObjectsByType<EnemyBase>(FindObjectsSortMode.None);
+            if (enemyBases.Length == 0) return null;
 
             GameObject nearest = null;
             float minDistSq = float.MaxValue;
-            foreach (var e in enemies)
+            foreach (var eb in enemyBases)
             {
-                float dSq = (e.transform.position - transform.position).sqrMagnitude;
-                if (dSq < minDistSq) { minDistSq = dSq; nearest = e; }
+                float dSq = (eb.transform.position - transform.position).sqrMagnitude;
+                if (dSq < minDistSq) { minDistSq = dSq; nearest = eb.gameObject; }
             }
             return nearest;
         }

@@ -1,13 +1,13 @@
 using UnityEngine;
-using TMPro;
+
 
 namespace RoguelikeSurvivor
 {
     public class TimerUI : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _timerText;
+        [SerializeField] private Text _timerText;
 
-        public void InjectText(TMP_Text text) => _timerText = text;
+        public void InjectText(Text text) => _timerText = text;
 
         private void Update()
         {

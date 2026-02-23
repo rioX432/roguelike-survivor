@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 
 namespace RoguelikeSurvivor
 {
@@ -10,8 +10,8 @@ namespace RoguelikeSurvivor
     public class UpgradeCardUI : MonoBehaviour
     {
         [SerializeField] private Image _iconImage;
-        [SerializeField] private TMP_Text _titleText;
-        [SerializeField] private TMP_Text _descriptionText;
+        [SerializeField] private Text _titleText;
+        [SerializeField] private Text _descriptionText;
         [SerializeField] private Button _button;
 
         private LevelUpPanel _panel;

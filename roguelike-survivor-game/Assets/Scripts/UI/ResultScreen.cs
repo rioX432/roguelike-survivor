@@ -1,21 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using TMPro;
+
 
 namespace RoguelikeSurvivor
 {
     public class ResultScreen : MonoBehaviour
     {
         [SerializeField] private GameObject _panelRoot;
-        [SerializeField] private TMP_Text _survivalTimeText;
-        [SerializeField] private TMP_Text _enemiesKilledText;
-        [SerializeField] private TMP_Text _levelReachedText;
+        [SerializeField] private Text _survivalTimeText;
+        [SerializeField] private Text _enemiesKilledText;
+        [SerializeField] private Text _levelReachedText;
         [SerializeField] private Button _retryButton;
 
         private float _survivalTime;
 
-        public void InjectUI(GameObject panel, TMP_Text time, TMP_Text kills, TMP_Text level, Button retry)
+        public void InjectUI(GameObject panel, Text time, Text kills, Text level, Button retry)
         {
             _panelRoot = panel;
             _survivalTimeText = time;

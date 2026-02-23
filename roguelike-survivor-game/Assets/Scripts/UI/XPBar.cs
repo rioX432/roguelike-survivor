@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 
 namespace RoguelikeSurvivor
 {
     public class XPBar : MonoBehaviour
     {
         [SerializeField] private Slider _slider;
-        [SerializeField] private TMP_Text _levelText;
+        [SerializeField] private Text _levelText;
 
         public void InjectSlider(Slider slider) => _slider = slider;
-        public void InjectLevelText(TMP_Text text) => _levelText = text;
+        public void InjectLevelText(Text text) => _levelText = text;
 
         private void Update()
         {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 
 namespace RoguelikeSurvivor
 {
@@ -14,13 +14,13 @@ namespace RoguelikeSurvivor
 
         [SerializeField] private GameObject _panel;
         [SerializeField] private List<Button> _cardButtons;
-        [SerializeField] private List<TMP_Text> _cardNameTexts;
+        [SerializeField] private List<Text> _cardNameTexts;
         [SerializeField] private List<Image> _cardIconImages;
 
         private List<WeaponData> _currentOptions;
         private PlayerController _player;
 
-        public void InjectPanel(GameObject panel, List<Button> buttons, List<TMP_Text> texts)
+        public void InjectPanel(GameObject panel, List<Button> buttons, List<Text> texts)
         {
             _panel = panel;
             _cardButtons = buttons;
