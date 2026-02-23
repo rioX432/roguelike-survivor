@@ -18,6 +18,10 @@ namespace RoguelikeSurvivor
         // Cached direction — no allocation in FixedUpdate
         private Vector2 _moveDir;
 
+        public EnemyData Data => _data;
+
+        public void SetXPGemPrefab(GameObject prefab) => _xpGemPrefab = prefab;
+
         public void Initialize(EnemyData data, Transform playerTransform)
         {
             _data = data;
@@ -90,7 +94,7 @@ namespace RoguelikeSurvivor
 
             GameObject gem = PoolManager.Instance.Spawn(_xpGemPrefab, transform.position, Quaternion.identity);
             if (gem.TryGetComponent<XPGem>(out var xpGem))
-                xpGem.Initialize(_data.xpDrop, _playerTransform);
+                xpGem.SetXPAmount(_data.xpDrop);
         }
 
         private void OnTriggerEnter2D(Collider2D other)

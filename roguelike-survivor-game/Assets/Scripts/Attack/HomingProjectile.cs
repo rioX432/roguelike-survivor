@@ -47,7 +47,7 @@ namespace RoguelikeSurvivor
             if (nearest != null)
             {
                 Vector2 toTarget = ((Vector2)nearest.transform.position - _rb.position).normalized;
-                _direction = Vector2.RotateTowards(_direction, toTarget, _homingStrength * Mathf.Deg2Rad * Time.fixedDeltaTime);
+                _direction = Vector2.Lerp(_direction, toTarget, _homingStrength * Time.fixedDeltaTime).normalized;
             }
 
             _rb.linearVelocity = _direction * _speed;

@@ -9,8 +9,10 @@ namespace RoguelikeSurvivor
     [RequireComponent(typeof(Collider2D))]
     public class Projectile : MonoBehaviour, IPoolable
     {
-        /// <summary>Static prefab reference. Set by GameManager or a spawner on Start.</summary>
+        /// <summary>Static prefab reference. Set by GameBootstrap or auto-detected on first spawn.</summary>
         public static GameObject PrefabInstance { get; private set; }
+
+        public static void RegisterPrefab(GameObject prefab) => PrefabInstance = prefab;
 
         private Rigidbody2D _rb;
         private float _damage;

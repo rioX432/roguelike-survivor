@@ -8,6 +8,8 @@ namespace RoguelikeSurvivor
         [SerializeField] private float _smoothSpeed = 5f;
         [SerializeField] private float _orthographicSize = 5f;
 
+        public void InjectTarget(Transform target) => _target = target;
+
         private const float CameraZ = -10f;
 
         private void Start()

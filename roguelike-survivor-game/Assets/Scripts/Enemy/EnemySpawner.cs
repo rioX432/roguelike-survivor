@@ -19,6 +19,13 @@ namespace RoguelikeSurvivor
 
         // Track active counts per enemy type
         private readonly Dictionary<string, int> _activeCounts = new();
+
+        public void InjectRefs(Transform player, SpawnTableData spawnTable, List<EnemyPrefabEntry> prefabs)
+        {
+            _player = player;
+            _spawnTable = spawnTable;
+            _enemyPrefabs = prefabs;
+        }
         // Track timers per wave
         private float[] _waveTimers;
 
@@ -78,8 +85,9 @@ namespace RoguelikeSurvivor
             Vector2 spawnPos = _player.position + (Vector3)(Random.insideUnitCircle.normalized * _spawnRadius);
             GameObject enemy = PoolManager.Instance.Spawn(prefab, spawnPos, Quaternion.identity);
 
-            if (enemy.TryGetComponent<EnemyBase>(out _))
+            if (enemy.TryGetComponent<EnemyBase>(out var eb))
             {
+                eb.Initialize(data, _player);
                 if (!_activeCounts.ContainsKey(key)) _activeCounts[key] = 0;
                 _activeCounts[key]++;
             }

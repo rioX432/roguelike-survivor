@@ -13,6 +13,9 @@ namespace RoguelikeSurvivor
 
         private PlayerStats _playerStats;
 
+        public void InjectSlider(Slider slider) => _slider = slider;
+        public void InjectFillImage(Image img) => _fillImage = img;
+
         private void Start()
         {
             var playerGO = GameObject.FindGameObjectWithTag("Player");

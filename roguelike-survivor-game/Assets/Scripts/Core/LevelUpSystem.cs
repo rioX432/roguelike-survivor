@@ -92,5 +92,7 @@ namespace RoguelikeSurvivor
         }
 
         public int GetEnemiesKilled() => _totalEnemiesKilled;
+
+        public void SetWeapons(List<WeaponData> weapons) => _availableWeapons = weapons;
     }
 }

@@ -15,6 +15,15 @@ namespace RoguelikeSurvivor
 
         private float _survivalTime;
 
+        public void InjectUI(GameObject panel, TMP_Text time, TMP_Text kills, TMP_Text level, Button retry)
+        {
+            _panelRoot = panel;
+            _survivalTimeText = time;
+            _enemiesKilledText = kills;
+            _levelReachedText = level;
+            _retryButton = retry;
+        }
+
         private void Start()
         {
             _panelRoot.SetActive(false);

@@ -14,10 +14,18 @@ namespace RoguelikeSurvivor
         private Vector2 _startPosition;
         private Canvas _canvas;
 
+        public void InjectRects(RectTransform background, RectTransform handle, float range)
+        {
+            _background = background;
+            _handle = handle;
+            _range = range;
+            _startPosition = background.anchoredPosition;
+        }
+
         private void Awake()
         {
             _canvas = GetComponentInParent<Canvas>();
-            _startPosition = _background.anchoredPosition;
+            if (_background != null) _startPosition = _background.anchoredPosition;
         }
 
         public void OnPointerDown(PointerEventData eventData)

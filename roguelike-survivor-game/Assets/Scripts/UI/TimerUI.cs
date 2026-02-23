@@ -7,6 +7,8 @@ namespace RoguelikeSurvivor
     {
         [SerializeField] private TMP_Text _timerText;
 
+        public void InjectText(TMP_Text text) => _timerText = text;
+
         private void Update()
         {
             if (_timerText == null || GameManager.Instance == null) return;

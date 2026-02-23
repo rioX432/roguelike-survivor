@@ -20,6 +20,13 @@ namespace RoguelikeSurvivor
         private List<WeaponData> _currentOptions;
         private PlayerController _player;
 
+        public void InjectPanel(GameObject panel, List<Button> buttons, List<TMP_Text> texts)
+        {
+            _panel = panel;
+            _cardButtons = buttons;
+            _cardNameTexts = texts;
+        }
+
         private void Awake()
         {
             if (Instance != null) { Destroy(gameObject); return; }
@@ -96,12 +103,9 @@ namespace RoguelikeSurvivor
 
         private static void AddOrUpgradeModule<T>(GameObject target, WeaponData data) where T : AttackModule
         {
-            // If module already exists, it just upgrades via data (inspector reference stays)
-            if (!target.TryGetComponent<T>(out _))
-            {
-                target.AddComponent<T>();
-            }
-            // Note: WeaponData assignment requires reflection or interface — skipped for MVP
+            if (!target.TryGetComponent<T>(out var existing))
+                existing = target.AddComponent<T>();
+            existing.SetData(data);
         }
     }
 }

@@ -9,6 +9,9 @@ namespace RoguelikeSurvivor
         [SerializeField] private Slider _slider;
         [SerializeField] private TMP_Text _levelText;
 
+        public void InjectSlider(Slider slider) => _slider = slider;
+        public void InjectLevelText(TMP_Text text) => _levelText = text;
+
         private void Update()
         {
             if (LevelUpSystem.Instance == null) return;

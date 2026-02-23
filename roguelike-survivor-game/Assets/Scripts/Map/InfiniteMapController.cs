@@ -17,20 +17,23 @@ namespace RoguelikeSurvivor
         private Transform[,] _chunks;
         private Vector2 _lastPlayerChunk;
 
+        public void SetPlayer(Transform player) => _player = player;
+        public void SetTile(Sprite tile) => _backgroundTile = tile;
+
         private void Awake()
         {
-            BuildChunkGrid();
+            // BuildChunkGrid is deferred to Start() so SetTile/SetPlayer can be called first
         }
 
         private void Start()
         {
+            BuildChunkGrid();
+
             if (_player == null)
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning("[InfiniteMapController] Player reference not set.");
-#endif
-                return;
-            }
+                _player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+            if (_player == null) return;
+
             _lastPlayerChunk = WorldToChunkCoord(_player.position);
             SnapChunksToPlayer();
         }

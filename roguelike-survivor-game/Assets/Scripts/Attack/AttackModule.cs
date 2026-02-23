@@ -38,6 +38,8 @@ namespace RoguelikeSurvivor
 
         protected abstract void Fire();
 
+        public void SetData(WeaponData data) => _data = data;
+
         /// <summary>Effective damage considering player stat bonuses.</summary>
         protected float GetDamage()
         {

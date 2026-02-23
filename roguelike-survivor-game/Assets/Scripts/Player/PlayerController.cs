@@ -9,12 +9,16 @@ namespace RoguelikeSurvivor
         [SerializeField] private PlayerStats _stats;
         [SerializeField] private VirtualJoystick _virtualJoystick;
 
+        public void InjectStats(PlayerStats stats) => _stats = stats;
+        public void InjectJoystick(VirtualJoystick joystick) => _virtualJoystick = joystick;
+
         private Rigidbody2D _rb;
         private Vector2 _moveInput;
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
+            if (_stats == null) TryGetComponent(out _stats);
         }
 
         private void Update()
