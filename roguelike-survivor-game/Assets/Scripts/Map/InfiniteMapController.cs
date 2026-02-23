@@ -52,6 +52,11 @@ namespace RoguelikeSurvivor
 
         private void BuildChunkGrid()
         {
+            // Use unlit material so tiles are always visible regardless of Light2D setup
+            var unlitShader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default")
+                           ?? Shader.Find("Sprites/Default");
+            Material unlitMat = unlitShader != null ? new Material(unlitShader) : null;
+
             _chunks = new Transform[3, 3];
             for (int y = 0; y < 3; y++)
             {
@@ -62,9 +67,23 @@ namespace RoguelikeSurvivor
 
                     var sr = go.AddComponent<SpriteRenderer>();
                     sr.sprite = _backgroundTile;
-                    sr.drawMode = SpriteDrawMode.Tiled;
-                    sr.size = new Vector2(_chunkSize, _chunkSize);
+                    sr.drawMode = SpriteDrawMode.Simple; // avoid Full Rect requirement
                     sr.sortingOrder = _sortingOrder;
+                    if (unlitMat != null) sr.material = unlitMat;
+
+                    // Scale chunk to cover chunkSize x chunkSize world units
+                    if (_backgroundTile != null)
+                    {
+                        float sw = _backgroundTile.bounds.size.x;
+                        float sh = _backgroundTile.bounds.size.y;
+                        float sx = _chunkSize / Mathf.Max(sw, 0.01f);
+                        float sy = _chunkSize / Mathf.Max(sh, 0.01f);
+                        go.transform.localScale = new Vector3(sx, sy, 1f);
+                    }
+                    else
+                    {
+                        go.transform.localScale = Vector3.one * _chunkSize;
+                    }
 
                     _chunks[x, y] = go.transform;
                 }

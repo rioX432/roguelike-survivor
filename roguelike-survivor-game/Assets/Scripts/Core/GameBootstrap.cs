@@ -77,7 +77,7 @@ namespace RoguelikeSurvivor
             erb.gravityScale = 0f; erb.freezeRotation = true;
             var ec = _enemyPrefabGO.AddComponent<CircleCollider2D>();
             ec.radius = 0.45f; ec.isTrigger = true;
-            _enemyPrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("enemy_bit_drone") ?? CircleSprite(40, new Color(1f, 0.2f, 0.2f));
+            AddUnlitSR(_enemyPrefabGO).sprite = LoadSprite("enemy_bit_drone") ?? CircleSprite(40, new Color(1f, 0.2f, 0.2f));
             _enemyPrefabGO.tag = "Enemy";
             _enemyPrefabGO.AddComponent<EnemyBase>(); // xpGemPrefab set after _xpGemPrefabGO created
             _enemyPrefabGO.SetActive(false);
@@ -88,7 +88,7 @@ namespace RoguelikeSurvivor
             prb.gravityScale = 0f; prb.freezeRotation = true;
             var pc = _projectilePrefabGO.AddComponent<CircleCollider2D>();
             pc.radius = 0.15f; pc.isTrigger = true;
-            _projectilePrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("projectile") ?? CircleSprite(10, Color.cyan);
+            AddUnlitSR(_projectilePrefabGO).sprite = LoadSprite("projectile") ?? CircleSprite(10, Color.cyan);
             _projectilePrefabGO.AddComponent<Projectile>();
             _projectilePrefabGO.SetActive(false);
             Projectile.RegisterPrefab(_projectilePrefabGO);
@@ -99,7 +99,7 @@ namespace RoguelikeSurvivor
             grb.gravityScale = 0f;
             var gc = _xpGemPrefabGO.AddComponent<CircleCollider2D>();
             gc.radius = 0.25f; gc.isTrigger = true;
-            _xpGemPrefabGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("xp_gem") ?? DiamondSprite(16, Color.yellow);
+            AddUnlitSR(_xpGemPrefabGO).sprite = LoadSprite("xp_gem") ?? DiamondSprite(16, Color.yellow);
             _xpGemPrefabGO.AddComponent<XPGem>();
             _xpGemPrefabGO.SetActive(false);
 
@@ -116,7 +116,7 @@ namespace RoguelikeSurvivor
             var rb = _playerGO.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f; rb.freezeRotation = true;
             _playerGO.AddComponent<CircleCollider2D>().radius = 0.45f;
-            _playerGO.AddComponent<SpriteRenderer>().sprite = LoadSprite("player") ?? CircleSprite(56, new Color(0.5f, 0.8f, 1f));
+            AddUnlitSR(_playerGO).sprite = LoadSprite("player") ?? CircleSprite(56, new Color(0.5f, 0.8f, 1f));
 
             var stats = _playerGO.AddComponent<PlayerStats>();
             var ctrl = _playerGO.AddComponent<PlayerController>();
@@ -478,6 +478,25 @@ namespace RoguelikeSurvivor
             MakeWeapon("Wide Cone",      AttackType.Cone,    20f, 0.6f, 11f, 12f, 7),
             MakeWeapon("Multi-Homing",   AttackType.Homing,  25f, 1.0f, 9f,  18f, 5),
         };
+
+        // ─── Unlit Material Helper ─────────────────────────────────────────
+        // URP 2D: Sprite-Lit-Default requires Light2D; use Unlit so sprites
+        // are always visible regardless of light setup.
+
+        private static Material _unlitMat;
+
+        private static SpriteRenderer AddUnlitSR(GameObject go)
+        {
+            var sr = go.AddComponent<SpriteRenderer>();
+            if (_unlitMat == null)
+            {
+                var sh = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default")
+                      ?? Shader.Find("Sprites/Default");
+                if (sh != null) _unlitMat = new Material(sh);
+            }
+            if (_unlitMat != null) sr.material = _unlitMat;
+            return sr;
+        }
 
         // ─── Resource Sprite Loader ────────────────────────────────────────
 
