@@ -36,6 +36,7 @@ namespace RoguelikeSurvivor
         {
             if (IsInvincible) return;
 
+            AudioManager.Instance?.PlayPlayerHit();
             CurrentHP -= amount;
             _invincibilityTimer = _invincibilityDuration;
 

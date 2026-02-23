@@ -48,7 +48,40 @@ namespace RoguelikeSurvivor
 
         private void Start()
         {
+            LoadClipsFromResources();
             PlayBGM();
+        }
+
+        /// <summary>
+        /// Auto-load audio clips from Resources/Audio/.
+        /// User places files there: bgm_main, se_attack_fire, se_enemy_hit,
+        /// se_enemy_die, se_level_up, se_player_hit
+        /// </summary>
+        private void LoadClipsFromResources()
+        {
+            _bgmClip        = _bgmClip        ?? Resources.Load<AudioClip>("Audio/bgm_main");
+            _seAttackFire   = _seAttackFire   ?? Resources.Load<AudioClip>("Audio/se_attack_fire");
+            _seEnemyHit     = _seEnemyHit     ?? Resources.Load<AudioClip>("Audio/se_enemy_hit");
+            _seEnemyDie     = _seEnemyDie     ?? Resources.Load<AudioClip>("Audio/se_enemy_die");
+            _seLevelUp      = _seLevelUp      ?? Resources.Load<AudioClip>("Audio/se_level_up");
+            _sePlayerHit    = _sePlayerHit    ?? Resources.Load<AudioClip>("Audio/se_player_hit");
+
+            // Wire AudioSources from siblings if not injected via Inspector
+            if (_bgmSource == null)
+            {
+                var sources = GetComponents<AudioSource>();
+                if (sources.Length > 0)
+                {
+                    _bgmSource = sources[0];
+                    _bgmSource.loop = true;
+                    _bgmSource.volume = _bgmVolume;
+                }
+                if (sources.Length > 1)
+                {
+                    _sePool = new AudioSource[sources.Length - 1];
+                    System.Array.Copy(sources, 1, _sePool, 0, _sePool.Length);
+                }
+            }
         }
 
         private void HandleEnemyDeath(GameObject _) => PlaySE(_seEnemyDie);

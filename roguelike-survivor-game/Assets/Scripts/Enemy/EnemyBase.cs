@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace RoguelikeSurvivor
@@ -32,6 +33,11 @@ namespace RoguelikeSurvivor
                 _currentHP = _data.maxHP;
                 _isDead = false;
                 transform.localScale = Vector3.one * _data.scale;
+                // Apply per-enemy-type sprite
+                if (_spriteRenderer != null && _data.sprite != null)
+                    _spriteRenderer.sprite = _data.sprite;
+                if (_spriteRenderer != null)
+                    _spriteRenderer.color = Color.white;
             }
         }
 
@@ -74,9 +80,19 @@ namespace RoguelikeSurvivor
         public void TakeDamage(float amount)
         {
             if (_isDead) return;
+            AudioManager.Instance?.PlayEnemyHit();
+            if (_spriteRenderer != null) StartCoroutine(HitFlash());
             _currentHP -= amount;
             if (_currentHP <= 0f)
                 Die();
+        }
+
+        private IEnumerator HitFlash()
+        {
+            _spriteRenderer.color = new Color(1f, 0.25f, 0.25f);
+            yield return new WaitForSeconds(0.08f);
+            if (!_isDead && _spriteRenderer != null)
+                _spriteRenderer.color = Color.white;
         }
 
         private void Die()
@@ -101,7 +117,10 @@ namespace RoguelikeSurvivor
 
             GameObject gem = PoolManager.Instance.Spawn(_xpGemPrefab, transform.position, Quaternion.identity);
             if (gem.TryGetComponent<XPGem>(out var xpGem))
+            {
                 xpGem.SetXPAmount(_data.xpDrop);
+                if (_playerTransform != null) xpGem.SetPlayer(_playerTransform);
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)

@@ -28,9 +28,10 @@ namespace RoguelikeSurvivor
         public void OnSpawn()
         {
             _isBeingAttracted = false;
+            // Player transform injected via SetPlayer(); fallback to tag search only once
             if (_playerTransform == null)
             {
-                var p = GameObject.FindGameObjectWithTag("Player");
+                var p = GameObject.FindWithTag("Player");
                 if (p != null) _playerTransform = p.transform;
             }
         }
@@ -67,5 +68,6 @@ namespace RoguelikeSurvivor
         }
 
         public void SetXPAmount(float amount) => _xpAmount = amount;
+        public void SetPlayer(Transform player) => _playerTransform = player;
     }
 }

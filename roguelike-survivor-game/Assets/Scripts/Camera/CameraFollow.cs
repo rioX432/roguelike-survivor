@@ -5,8 +5,8 @@ namespace RoguelikeSurvivor
     public class CameraFollow : MonoBehaviour
     {
         [SerializeField] private Transform _target;
-        [SerializeField] private float _smoothSpeed = 5f;
-        [SerializeField] private float _orthographicSize = 5f;
+        [SerializeField] private float _smoothSpeed = 8f;
+        [SerializeField] private float _orthographicSize = 6f;
 
         public void InjectTarget(Transform target) => _target = target;
 

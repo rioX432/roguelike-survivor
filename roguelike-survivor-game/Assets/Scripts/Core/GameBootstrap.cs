@@ -52,19 +52,30 @@ namespace RoguelikeSurvivor
         // ─── Managers ──────────────────────────────────────────────────────
         private void CreateManagers()
         {
-            // Force-init TMP_Settings so TextMeshProUGUI works at runtime without asset file
+            // Force-init TMP_Settings with a built-in font so text renders without imported assets
             try
             {
-                var existing = Resources.Load<TMP_Settings>("TMP Settings");
-                if (existing == null)
+                if (Resources.Load<TMP_Settings>("TMP Settings") == null)
                 {
                     var s = ScriptableObject.CreateInstance<TMP_Settings>();
-                    var field = typeof(TMP_Settings).GetField("s_Instance",
-                        BindingFlags.Static | BindingFlags.NonPublic);
-                    field?.SetValue(null, s);
+                    // Create font asset from built-in Arial
+                    var arial = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    if (arial != null)
+                    {
+                        var fontAsset = TMP_FontAsset.CreateFontAsset(arial);
+                        typeof(TMP_Settings)
+                            .GetField("m_defaultFontAsset", BindingFlags.Instance | BindingFlags.NonPublic)
+                            ?.SetValue(s, fontAsset);
+                        typeof(TMP_Settings)
+                            .GetField("m_defaultFontAssetSize", BindingFlags.Instance | BindingFlags.NonPublic)
+                            ?.SetValue(s, 36);
+                    }
+                    typeof(TMP_Settings)
+                        .GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic)
+                        ?.SetValue(null, s);
                 }
             }
-            catch { /* TMP not available, text labels will be absent */ }
+            catch { /* TMP unavailable — text labels will be absent */ }
 
             // URP 2D: Global Light required for all sprites to be visible
             var lightGO = new GameObject("GlobalLight2D");
@@ -259,11 +270,11 @@ namespace RoguelikeSurvivor
             var table = ScriptableObject.CreateInstance<SpawnTableData>();
             table.waves = new List<WaveEntry>
             {
-                new WaveEntry { timeStart=0f,  timeEnd=60f,  enemyData=MakeEnemy("Bit Drone",   10f, 2.5f, 5f,  3f, 2.0f),  spawnRate=0.8f, maxActive=20 },
-                new WaveEntry { timeStart=30f, timeEnd=180f, enemyData=MakeEnemy("Glitch Bug",  20f, 3.2f, 8f,  6f, 1.8f),  spawnRate=0.5f, maxActive=15 },
-                new WaveEntry { timeStart=120f,timeEnd=360f, enemyData=MakeEnemy("Rust Walker", 50f, 1.8f, 12f, 10f,2.5f),  spawnRate=0.3f, maxActive=10 },
-                new WaveEntry { timeStart=240f,timeEnd=480f, enemyData=MakeEnemy("Siege Core",  100f,1.2f, 18f, 15f,3.5f),  spawnRate=0.2f, maxActive=6  },
-                new WaveEntry { timeStart=420f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 300f,1.0f, 25f, 30f,5.0f),  spawnRate=0.1f, maxActive=3  },
+                new WaveEntry { timeStart=0f,  timeEnd=60f,  enemyData=MakeEnemy("Bit Drone",   10f, 2.5f, 5f,  3f, 2.0f, "enemy_bit_drone"),   spawnRate=0.8f, maxActive=20 },
+                new WaveEntry { timeStart=30f, timeEnd=180f, enemyData=MakeEnemy("Glitch Bug",  20f, 3.2f, 8f,  6f, 1.8f, "enemy_glitch_bug"),   spawnRate=0.5f, maxActive=15 },
+                new WaveEntry { timeStart=120f,timeEnd=360f, enemyData=MakeEnemy("Rust Walker", 50f, 1.8f, 12f, 10f,2.5f, "enemy_rust_walker"),  spawnRate=0.3f, maxActive=10 },
+                new WaveEntry { timeStart=240f,timeEnd=480f, enemyData=MakeEnemy("Siege Core",  100f,1.2f, 18f, 15f,3.5f, "enemy_siege_core"),   spawnRate=0.2f, maxActive=6  },
+                new WaveEntry { timeStart=420f,timeEnd=600f, enemyData=MakeEnemy("Overlord AI", 300f,1.0f, 25f, 30f,5.0f, "enemy_overlord_ai"),  spawnRate=0.1f, maxActive=3  },
             };
 
             // Register enemy prefab for each enemy type (all share base prefab, Initialize sets stats)
@@ -475,7 +486,8 @@ namespace RoguelikeSurvivor
         }
 
         private static EnemyData MakeEnemy(string enemyName,
-            float hp, float speed, float contactDmg, float xp, float scale)
+            float hp, float speed, float contactDmg, float xp, float scale,
+            string spriteName = null)
         {
             var d = ScriptableObject.CreateInstance<EnemyData>();
             d.enemyName = enemyName;
@@ -484,6 +496,7 @@ namespace RoguelikeSurvivor
             d.contactDamage = contactDmg;
             d.xpDrop = xp;
             d.scale = scale;
+            if (spriteName != null) d.sprite = LoadSprite(spriteName);
             return d;
         }
 

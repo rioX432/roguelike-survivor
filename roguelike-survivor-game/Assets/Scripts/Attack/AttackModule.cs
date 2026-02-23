@@ -32,6 +32,7 @@ namespace RoguelikeSurvivor
             if (_timer >= adjustedInterval)
             {
                 _timer = 0f;
+                AudioManager.Instance?.PlayAttackFire();
                 Fire();
             }
         }
