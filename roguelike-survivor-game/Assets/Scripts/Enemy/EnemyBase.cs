@@ -7,6 +7,7 @@ namespace RoguelikeSurvivor
     public class EnemyBase : MonoBehaviour, IPoolable
     {
         [SerializeField] protected EnemyData _data;
+        [SerializeField] private GameObject _xpGemPrefab;
 
         public EnemyData Data => _data;
         public float CurrentHP { get; private set; }
@@ -96,10 +97,12 @@ namespace RoguelikeSurvivor
         {
             EventBus.RaiseEnemyDeath(gameObject);
 
-            // Drop XP gem via pool
-            if (PoolManager.Instance != null && XPGem.Prefab != null)
+            // Drop XP gem via pool (prefab assigned by EnemySpawner/GameManager at runtime)
+            if (PoolManager.Instance != null && _xpGemPrefab != null)
             {
-                PoolManager.Instance.Spawn(XPGem.Prefab, transform.position, Quaternion.identity);
+                var gem = PoolManager.Instance.Spawn(_xpGemPrefab, transform.position, Quaternion.identity);
+                if (gem.TryGetComponent<XPGem>(out var xpGem))
+                    xpGem.SetXPAmount(_data != null ? _data.xpDrop : 5f);
             }
 
             // Return to pool
